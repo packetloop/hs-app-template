@@ -1,0 +1,41 @@
+resolver: lts-8.11
+
+packages:
+- '.'
+- location:
+    git: https://github.com/haskell-works/hw-kafka-client
+    commit: 27bf3b295b148a34d1927a2ab092ff42554aadb9
+  extra-dep: true
+- location:
+    git: https://github.com/haskell-works/hw-kafka-conduit
+    commit: ab7b2498bfdd037ccc3aaff68d476e64acae9675
+  extra-dep: true
+- location:
+    git: https://github.com/haskell-works/hw-haskell-avro
+    commit: ab382300c82dedfb69f51db5f3110eedb6efffb2
+  extra-dep: true
+- location:
+    git: https://github.com/haskell-works/hw-kafka-avro
+    commit: 2de2f9af1c0041e09223d199bb79e94d198689c2
+  extra-dep: true
+- location:
+    git: https://github.com/packetloop/datadog
+    commit: 7ddf1ad204625791f1b9611b6380a4789e1aa3fd
+  extra-dep: true
+- location:
+    git: git@github.com:packetloop/hs-arbor-logger.git
+    commit: 339570559074b7de94fcd3d2f96b86db50494f0e
+  extra-dep: true
+
+# Dependency packages to be pulled from upstream that are not in the resolver
+# (e.g., acme-missiles-0.3)
+extra-deps:
+  - pure-zlib-0.6
+  - hedgehog-0.1
+
+# Override default flag values for local packages and extra-deps
+flags: {}
+
+# Extra package databases containing global packages
+extra-package-dbs: []
+

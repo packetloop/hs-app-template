@@ -1,0 +1,40 @@
+machine:
+  ghc:
+    version: 7.10.2
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - "~/.stack"
+
+  pre:
+    - wget -qO- https://get.haskellstack.org/ | sh || stack upgrade
+    - "git fetch --unshallow || true"
+
+  override:
+    - scripts/build-librdkafka.sh
+    - stack setup
+    - stack clean
+    - LD_LIBRARY_PATH=/usr/local/lib stack build --test --no-run-tests --haddock --no-haddock-deps
+    - ./scripts/container.sh build
+
+test:
+  override:
+    - LD_LIBRARY_PATH=/usr/local/lib stack test
+    - ./scripts/container.sh test
+
+  post:
+   - find . -path "*/test-reports/*" -exec mv {} ${CIRCLE_TEST_REPORTS} \;
+
+deployment:
+  bintray:
+    owner: packetloop
+    branch: [develop,master]
+    commands:
+    - ./scripts/container.sh push
+
+  development:
+    branch: /.*MAYH.*/
+    commands:
+    - ./scripts/container.sh push
