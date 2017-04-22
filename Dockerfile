@@ -6,6 +6,11 @@ ADD docker/set-environment.sh /usr/local/bin/set-environment
 RUN apt-get install -y jq && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+ADD rdkafka.tar.gz /usr/local/
+
+ENV LOG_LEVEL INFO
+ENV LD_LIBRARY_PATH /usr/local/lib
+
 ADD docker/start.sh /start.sh
 ADD docker/test.sh /test.sh
 ADD .stack-work/install/x86_64-linux*/*/*/bin/* /usr/local/bin/
