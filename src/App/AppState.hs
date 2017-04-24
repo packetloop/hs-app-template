@@ -1,4 +1,4 @@
-module AppState
+module App.AppState
 where
 
 data AppState = AppState {}

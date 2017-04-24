@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Application
+module App.Application
 where
 
 import Arbor.Logger
@@ -14,8 +14,8 @@ import Control.Monad.Trans.Resource
 import Data.Conduit
 import Network.AWS                  as AWS hiding (LogLevel)
 
-import AppState
-import Options
+import App.AppState
+import App.Options
 
 
 newtype Application a = Application
