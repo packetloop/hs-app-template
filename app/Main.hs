@@ -7,14 +7,14 @@ import Control.Monad.Trans.AWS
 import Network.AWS.S3.Types    (Region (..))
 import System.IO               (stdout)
 
-import Application
-import AppState
-import Options
+import App.Application
+import App.AppState
+import App.Options
 
 
 main :: IO ()
 main = do
-  let opt = Options LevelInfo Oregon
+  opt <- parseOptions
   env <- mkEnv opt
   _ <- runGeoMute opt env
   putStrLn "Exiting."
