@@ -1,11 +1,13 @@
 {-# LANGUAGE TemplateHaskell #-}
 module App.Options where
 
+import Arbor.Datadog.Conduit (StatsTag (..))
 import Control.Lens
 import Control.Monad.Logger  (LogLevel (..))
 import Data.Semigroup        ((<>))
 import Network.AWS.Data.Text (FromText (..), fromText)
 import Network.AWS.S3.Types  (Region (..))
+import Network.Socket        (HostName)
 import Options.Applicative
 import Text.Read             (readEither)
 
@@ -23,6 +25,9 @@ data Options = Options
   , _optGroupId               :: ConsumerGroupId
   , _optSchemaRegistryAddress :: String
   , _optKafkaPollTimeout      :: Int
+  , _optStatsdHost            :: HostName
+  , _optStatsdPort            :: Int
+  , _optStatsdTags            :: [StatsTag]
   } deriving (Show)
 
 makeLenses ''Options
@@ -71,6 +76,25 @@ options = Options
        <> metavar "KAFKA_POLL_TIMEOUT"
        <> showDefault <> value 1000
        <> help "Kafka poll timeout")
+  <*> strOption
+       (  long "statsd-host"
+       <> short 's'
+       <> metavar "HOST_NAME"
+       <> showDefault <> value "127.0.0.1"
+       <> help "StatsD host name or IP address")
+  <*> readOption
+       (  long "statsd-port"
+       <> short 'p'
+       <> metavar "PORT"
+       <> showDefault <> value 8125
+       <> help "StatsD port"
+       <> hidden)
+  <*> ( string2Tags <$> strOption
+       (  long "statsd-tags"
+       <> short 't'
+       <> metavar "TAGS"
+       <> showDefault <> value []
+       <> help "StatsD tags"))
 
 awsLogLevel :: Options -> AWS.LogLevel
 awsLogLevel o = case o ^. optLogLevel of
@@ -84,12 +108,18 @@ readOption :: Read a => Mod OptionFields a -> Parser a
 readOption = option $ eitherReader readEither
 
 readOptionMsg :: Read a => String -> Mod OptionFields a -> Parser a
-readOptionMsg msg = option $ (eitherReader ((either (Left . const msg) (Right . id)) . readEither))
+readOptionMsg msg = option $ eitherReader (either (Left . const msg) Right . readEither)
 
 readOrFromTextOption :: (Read a, FromText a) => Mod OptionFields a -> Parser a
 readOrFromTextOption =
   let fromStr s = readEither s <|> fromText (T.pack s)
   in option $ eitherReader fromStr
+
+string2Tags :: String -> [StatsTag]
+string2Tags s = StatsTag . splitTag <$> splitTags
+  where
+    splitTags = T.split (==',') (T.pack s)
+    splitTag t = T.drop 1 <$> T.break (==':') t
 
 optionsParser :: ParserInfo Options
 optionsParser = info (helper <*> options)

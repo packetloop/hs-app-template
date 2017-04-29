@@ -12,19 +12,27 @@ packages:
   extra-dep: true
 - location:
     git: https://github.com/haskell-works/hw-haskell-avro
-    commit: ab382300c82dedfb69f51db5f3110eedb6efffb2
+    commit: 8b9420f5e1a0495c2717ce5cfe97c537ef3417a1
   extra-dep: true
 - location:
     git: https://github.com/haskell-works/hw-kafka-avro
-    commit: 2de2f9af1c0041e09223d199bb79e94d198689c2
+    commit: 1c3ef79fa58082f7bae94ae34dee22d2b2c7045c
   extra-dep: true
 - location:
     git: https://github.com/packetloop/datadog
-    commit: 7ddf1ad204625791f1b9611b6380a4789e1aa3fd
+    commit: 9afb2e6322811af3c083a95436b4f358454c0273
   extra-dep: true
 - location:
+    git: git@github.com:packetloop/datadog-conduit.git
+    commit: e74c20d508b50d75915ab569768026c4c29de7d2
+  extra-dep: True
+- location:
     git: git@github.com:packetloop/hs-arbor-logger.git
-    commit: 339570559074b7de94fcd3d2f96b86db50494f0e
+    commit: 5cb8c29152fd3a5c0a96ae6c02b21ee1fba9ec92
+  extra-dep: true
+- location:
+    git: https://github.com/haskell-works/hw-conduit
+    commit: 6e75e5b52b7cdf3d1f47312d4057932293f43672
   extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver

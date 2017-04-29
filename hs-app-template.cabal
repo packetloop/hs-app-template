@@ -1,8 +1,8 @@
-name:                {{project-name}}
+name:                hs-app-template
 version:             1.0.0
 -- synopsis:
 -- description:
-homepage:            https://github.com/packetloop/{{project-name}}#readme
+homepage:            https://github.com/packetloop/hs-app-template#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Tyler Durden
@@ -13,12 +13,13 @@ build-type:          Simple
 cabal-version:       >=1.10
 extra-source-files:  README.md
 
-executable {{project-name}}
+executable hs-app-template
   hs-source-dirs:       app
   main-is:              Main.hs
+  other-modules:        Service
   default-language:     Haskell2010
   build-depends:        base >= 4.7 && < 5
-                      , {{project-name}}
+                      , hs-app-template
                       , amazonka
                       , amazonka-core
                       , amazonka-s3
@@ -28,11 +29,13 @@ executable {{project-name}}
                       , conduit
                       , containers
                       , datadog
+                      , datadog-conduit
                       , directory
                       , etc
                       , exceptions
                       , fast-logger
                       , hs-arbor-logger
+                      , hw-conduit
                       , hw-kafka-avro
                       , hw-kafka-client
                       , hw-kafka-conduit
@@ -54,9 +57,13 @@ executable {{project-name}}
 
 library
   hs-source-dirs:       src
-  exposed-modules:      App.Application
+  exposed-modules:      App
+                      , App.Application
+                      , App.AppError                      
                       , App.AppState
+                      , App.Kafka
                       , App.Options
+                      , App.Orphans
   default-language:     Haskell2010
   ghc-options:          -Wall
   build-depends:        base >= 4.7 && < 5
@@ -69,10 +76,12 @@ library
                       , conduit
                       , containers
                       , datadog
+                      , datadog-conduit
                       , directory
                       , exceptions
                       , fast-logger
                       , hs-arbor-logger
+                      , hw-conduit
                       , hw-kafka-avro
                       , hw-kafka-client
                       , hw-kafka-conduit
@@ -98,7 +107,7 @@ test-suite tests
   main-is:              Spec.hs
   ghc-options:          -Wall -threaded
   build-depends:        base >= 4.7 && < 5
-                      , {{project-name}}
+                      , hs-app-template
                       , hspec
                       , hedgehog
                       , amazonka
@@ -110,10 +119,12 @@ test-suite tests
                       , conduit
                       , containers
                       , datadog
+                      , datadog-conduit
                       , directory
                       , exceptions
                       , fast-logger
                       , hs-arbor-logger
+                      , hw-conduit
                       , hw-kafka-avro
                       , hw-kafka-client
                       , hw-kafka-conduit

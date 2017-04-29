@@ -6,7 +6,7 @@ ADD docker/set-environment.sh /usr/local/bin/set-environment
 RUN apt-get install -y jq && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ADD rdkafka.tar.gz /usr/local/
+COPY docker/rdkafka/ /usr/local/
 
 ENV LOG_LEVEL INFO
 ENV LD_LIBRARY_PATH /usr/local/lib
@@ -23,12 +23,12 @@ ADD .stack-work/install/x86_64-linux*/*/*/bin/* /usr/local/bin/
 
 # REQUIRE AWS_REGION                       string
 
+# REQUIRE LOG_LEVEL                        LevelDebug
+
 # REQUIRE KAFKA_POLL_TIMEOUT               1.0
 # REQUIRE KAFKA_GROUP_ID                   group-id
 # REQUIRE KAFKA_BOOTSTRAP                  hostnames
-# REQUIRE KAFKA_SCHEMA_REGISTRY            url 
+# REQUIRE KAFKA_SCHEMA_REGISTRY            url
 
-
-ENV LOG_LEVEL INFO
 
 CMD ["/start.sh"]

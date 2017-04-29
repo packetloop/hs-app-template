@@ -11,7 +11,7 @@ fi
 echo "Un-templating into $PRJ_NAME"
 mv "hs-app-template.cabal" "$PRJ_NAME.cabal"
 rm -rf .git .stack-work
-find . -type f -exec sed -i '' "s/{{project-name}}/$PRJ_NAME/g" {} +
+find . -type f -exec sed -i '' "s/hs-app-template/$PRJ_NAME/g" {} +
 
 
 
