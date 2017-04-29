@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 module App.Options where
 
-import Arbor.Datadog.Conduit (StatsTag (..))
+import Arbor.Datadog.Conduit (SampleRate (..), StatsTag (..))
 import Control.Lens
 import Control.Monad.Logger  (LogLevel (..))
 import Data.Semigroup        ((<>))
@@ -28,6 +28,7 @@ data Options = Options
   , _optStatsdHost            :: HostName
   , _optStatsdPort            :: Int
   , _optStatsdTags            :: [StatsTag]
+  , _optSampleRate            :: SampleRate
   } deriving (Show)
 
 makeLenses ''Options
@@ -95,6 +96,12 @@ options = Options
        <> metavar "TAGS"
        <> showDefault <> value []
        <> help "StatsD tags"))
+  <*> (SampleRate <$> readOption
+      (  long "statsd-sample-rate"
+      <> short 'a'
+      <> metavar "SAMPLE_RATE"
+      <> showDefault <> value 0.01
+      <> help "StatsD sample rate"))
 
 awsLogLevel :: Options -> AWS.LogLevel
 awsLogLevel o = case o ^. optLogLevel of
