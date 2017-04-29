@@ -8,7 +8,7 @@ RUN apt-get install -y jq && \
 
 COPY docker/rdkafka/ /usr/local/
 
-ENV LOG_LEVEL INFO
+ENV LOG_LEVEL LevelInfo
 ENV LD_LIBRARY_PATH /usr/local/lib
 
 ADD docker/start.sh /start.sh
