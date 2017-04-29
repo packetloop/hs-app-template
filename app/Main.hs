@@ -15,7 +15,7 @@ import System.IO                            (stdout)
 
 import App
 import App.Kafka
-import Service
+import Service   as Srv
 
 
 main :: IO ()
@@ -39,10 +39,10 @@ main = do
     logInfo "Running Kafka Consumer"
     runConduit $
       kafkaSourceNoClose consumer (Timeout (opt ^. optKafkaPollTimeout))
-      .| throwLeftSatisfy isFatal
-      .| skipNonFatalExcept [isPollTimeout]
-      .| handleStream sr statsSink
-      .| everyN 100
+      .| throwLeftSatisfy isFatal             -- throw any fatal error
+      .| skipNonFatalExcept [isPollTimeout]   -- discard any non-fatal except poll timeouts
+      .| Srv.handleStream sr statsSink        -- handle messages (see Service.hs)
+      .| everyN 100                           -- after every 100 messages commit offsets
       .| commitOffsetsSink consumer
 
     logError "Premature exit, must not happen."
