@@ -13,6 +13,9 @@ mv "hs-app-template.cabal" "$PRJ_NAME.cabal"
 rm -rf .git .stack-work
 find . -type f -exec sed -i '' "s/hs-app-template/$PRJ_NAME/g" {} +
 
+cat > ./README.md <<EOF
+# $PRJ_NAME
 
+EOF
 
 rm untemplate.sh
