@@ -10,6 +10,7 @@ import Data.Conduit
 import Data.Monoid                  ((<>))
 import Kafka.Conduit
 
+
 mkConsumer :: (MonadIO m, MonadResource m) => Options -> m KafkaConsumer
 mkConsumer opts =
   let props = consumerBrokersList [opts ^. optKafkaBroker]

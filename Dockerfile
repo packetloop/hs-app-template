@@ -6,7 +6,7 @@ ADD docker/set-environment.sh /usr/local/bin/set-environment
 RUN apt-get install -y jq && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY docker/rdkafka/ /usr/local/
+COPY .librdkafka/ /usr/local/
 
 ENV LOG_LEVEL LevelInfo
 ENV LD_LIBRARY_PATH /usr/local/lib

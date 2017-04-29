@@ -70,3 +70,6 @@ TAGS
 
 *.ipynb
 __pycache*
+
+# transient librdkafka
+.librdkafka
