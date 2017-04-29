@@ -47,3 +47,13 @@ flags: {}
 # Extra package databases containing global packages
 extra-package-dbs: []
 
+# Added docker build configuration 
+# but disabled docker build by default.
+# "stack --docker build" will use this configuration.
+docker:
+  enable: false
+  repo: "fpco/stack-build:latest"
+  auto-pull: true
+  env:
+    - "LD_LIBRARY_PATH=docker/rdkafka/lib"
+    - "LD_INCLUDE_PATH=docker/rdkafka/include/librdkafka"
