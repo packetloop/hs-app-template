@@ -1,11 +1,11 @@
-name:                geofeed-mute
+name:                {{project-name}}
 version:             1.0.0
 -- synopsis:
 -- description:
-homepage:            https://github.com/packetloop/geofeed-mute#readme
+homepage:            https://github.com/packetloop/{{project-name}}#readme
 license:             BSD3
 license-file:        LICENSE
-author:              Alexey Raga
+author:              Tyler Durden
 maintainer:          tyler.durden@arbor.net
 copyright:           Arbor Networks
 category:            Services
@@ -13,12 +13,12 @@ build-type:          Simple
 cabal-version:       >=1.10
 extra-source-files:  README.md
 
-executable geofeed-mute
+executable {{project-name}}
   hs-source-dirs:       app
   main-is:              Main.hs
   default-language:     Haskell2010
   build-depends:        base >= 4.7 && < 5
-                      , geofeed-mute
+                      , {{project-name}}
                       , amazonka
                       , amazonka-core
                       , amazonka-s3
@@ -98,7 +98,7 @@ test-suite tests
   main-is:              Spec.hs
   ghc-options:          -Wall -threaded
   build-depends:        base >= 4.7 && < 5
-                      , geofeed-mute
+                      , {{project-name}}
                       , hspec
                       , hedgehog
                       , amazonka

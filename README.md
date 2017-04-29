@@ -1,1 +1,1 @@
-# geofeed-mute
+# {{project-name}}

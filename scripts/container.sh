@@ -21,19 +21,25 @@ if [ $? -ne 0 ]; then
   set -e
 fi
 
-
 case $1 in
   dev-build)
     set +e
     _image=fpco/stack-build:latest
-    _img=$(docker images ${_image} | tail -n +2)
-
-    if [ -z "${_img}" ]; then
-      docker pull $_image
+    if [[ ! -d "$PWD/docker/rdkafka" ]]; then
+      echo "Re-building librdkafka"
+      docker run --rm -v $PWD:/bld -it $_image bash -c "cd /bld && ./scripts/build-librdkafka.sh"
     fi
-    stack --docker --docker-image=${_image} build
+    echo "Building the project"
+    stack --docker --docker-image=$_image build \
+          --extra-include-dirs "$PWD/docker/rdkafka/include/librdkafka" \
+          --extra-lib-dirs "$PWD/docker/rdkafka/lib"
+
+    echo "Building the container"
     docker build -t ${BUILD_TAG} .
     docker tag ${BUILD_TAG} ${IMAGE_NAME}:latest
+
+    echo "Built: ${BUILD_TAG}"
+    echo "Built: ${IMAGE_NAME}:latest"
     set -e
   ;;
 
