@@ -19,3 +19,7 @@ cat > ./README.md <<EOF
 EOF
 
 rm untemplate.sh
+
+git init
+git add .
+git commit -m "Cloned from a template"
