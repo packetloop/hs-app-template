@@ -25,14 +25,11 @@ case $1 in
   dev-build)
     set +e
     _image=fpco/stack-build:latest
-    if [[ ! -d "$PWD/docker/rdkafka" ]]; then
-      echo "Re-building librdkafka"
-      docker run --rm -v $PWD:/bld -it $_image bash -c "cd /bld && ./scripts/build-librdkafka.sh"
-    fi
+    docker run --rm -v $PWD:/bld -it $_image bash -c "cd /bld && ./scripts/build-librdkafka.sh"
     echo "Building the project"
     stack --docker --docker-image=$_image build \
-          --extra-include-dirs "$PWD/docker/rdkafka/include/librdkafka" \
-          --extra-lib-dirs "$PWD/docker/rdkafka/lib"
+          --extra-include-dirs "$PWD/.librdkafka/include/librdkafka" \
+          --extra-lib-dirs "$PWD/.librdkafka/lib"
 
     echo "Building the container"
     docker build -t ${BUILD_TAG} .

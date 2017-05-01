@@ -1,40 +1,57 @@
-machine:
-  ghc:
-    version: 7.10.2
-  services:
-    - docker
+version: 2.0
+jobs:
+  build:
+    working_directory: ~/build
+    docker:
+      - image: fpco/stack-build:latest
 
-dependencies:
-  cache_directories:
-    - "~/.stack"
+    environment:
+      LD_LIBRARY_PATH: /usr/local/lib
 
-  pre:
-    - wget -qO- https://get.haskellstack.org/ | sh || stack upgrade
-    - "git fetch --unshallow || true"
+    steps:
+      - checkout
+      - restore_cache:
+          key: dot-stack
+      - restore_cache:
+          key: stack-work-{{ checksum "stack.yaml" }}
+      - restore_cache:
+          key: librdkafka-{{ checksum "scripts/build-librdkafka.sh" }}
 
-  override:
-    - scripts/build-librdkafka.sh
-    - stack setup
-    - stack clean
-    - LD_LIBRARY_PATH=/usr/local/lib stack build --test --no-run-tests --haddock --no-haddock-deps
-    - ./scripts/container.sh build
+      - run:
+          name: Build librdkafka
+          command: ./scripts/build-librdkafka.sh
 
-test:
-  override:
-    - LD_LIBRARY_PATH=/usr/local/lib stack test
-    - ./scripts/container.sh test
+      - run: stack setup
+      - run: stack build --test --no-run-tests 
 
-  post:
-   - find . -path "*/test-reports/*" -exec mv {} ${CIRCLE_TEST_REPORTS} \;
+      - setup_remote_docker
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
 
-deployment:
-  bintray:
-    owner: packetloop
-    branch: [develop,master]
-    commands:
-    - ./scripts/container.sh push
+      - run:
+          name: Build the container
+          command: ./scripts/container.sh build
 
-  development:
-    branch: /.*MAYH.*/
-    commands:
-    - ./scripts/container.sh push
+
+      - save_cache:
+          key: dot-stack
+          paths:
+            - ~/.stack
+
+      - save_cache:
+          key: stack-work-{{ checksum "stack.yaml" }}
+          paths: .stack-work
+
+      - save_cache:
+          key: librdkafka-{{ checksum "scripts/build-librdkafka.sh" }}
+          paths: .librdkafka
+
+      - deploy:
+          name: Pushing container
+          command: ./scripts/container.sh push

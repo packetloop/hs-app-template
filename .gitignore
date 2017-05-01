@@ -4,6 +4,7 @@
 
 ### OSX ###
 .DS_Store
+*.DS_Store
 .AppleDouble
 .LSOverride
 
@@ -70,3 +71,6 @@ TAGS
 
 *.ipynb
 __pycache*
+
+# transient librdkafka
+.librdkafka

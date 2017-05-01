@@ -3,8 +3,8 @@ Application template: Kafka, DataDog, AWS.
 
 ## Create new project
 
-- Clone (or copy) this template into a different folder
-- `cd` into a new project folder
-- Run `./untemplate.hs`
-- Run `stack build`
-
+```
+$ git clone git@github.com:packetloop/hs-app-template.git new_project
+$ cd new_project
+$ ./untemplate.sh
+```
