@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BUILD_NAME=$(basename $PWD)
+BUILD_NAME=$(cat *.cabal | grep -e "^name" | tr -s " " | cut -d' ' -f2)
 BUILD_BINTRAY=arbornetworks-docker-docker.bintray.io
 FORK_BUILD=true && [ "${CIRCLE_PROJECT_USERNAME:-}" = "packetloop" ] && [ "${CIRCLE_BRANCH:-}" = "master" ] && FORK_BUILD=false
 BUILD_VERSION=$(cat *.cabal | grep -e "^version" | tr -s " " | cut -d' ' -f2)

@@ -6,6 +6,12 @@ PRJ=$PWD
 DST="$PRJ/.librdkafka"
 VERSION_FILE="$DST/version.txt"
 
+if [ -f $VERSION_FILE ]; then
+    echo "Found librdkafka: $(cat $VERSION_FILE), expected: $RDKAFKA_VER"
+else
+    echo "librdkafka not found in $DST"
+fi
+
 if [ -f $VERSION_FILE ] && [ "$(cat $VERSION_FILE)" == $RDKAFKA_VER ]; then
     echo "Required version found, using it"
     sudo cp -r $DST/* /usr/local/
@@ -22,4 +28,6 @@ git reset $RDKAFKA_VER --hard
 cd src
 make && make install
 sudo cp -r $DST/* /usr/local/
+
+echo "Writing version file to $VERSION_FILE"
 echo $RDKAFKA_VER > $VERSION_FILE

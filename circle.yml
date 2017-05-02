@@ -1,7 +1,7 @@
 version: 2.0
 jobs:
   build:
-    working_directory: ~/build
+    working_directory: ~/hs-app-template
     docker:
       - image: fpco/stack-build:latest
 
@@ -11,7 +11,9 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: dot-stack
+          keys: 
+            - dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
+            - dot-stack
       - restore_cache:
           key: stack-work-{{ checksum "stack.yaml" }}
       - restore_cache:
@@ -39,18 +41,27 @@ jobs:
           command: ./scripts/container.sh build
 
 
+      - run:
+          name: Running unit tests
+          command: stack test
+
       - save_cache:
-          key: dot-stack
+          key: dot-stack-base
+          paths:
+            - ~/.stack
+
+      - save_cache:
+          key: dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
           paths:
             - ~/.stack
 
       - save_cache:
           key: stack-work-{{ checksum "stack.yaml" }}
-          paths: .stack-work
+          paths: ~/hs-app-template/.stack-work
 
       - save_cache:
           key: librdkafka-{{ checksum "scripts/build-librdkafka.sh" }}
-          paths: .librdkafka
+          paths: ~/hs-app-template/.librdkafka
 
       - deploy:
           name: Pushing container
