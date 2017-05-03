@@ -61,6 +61,7 @@ library
                       , App.Application
                       , App.AppError                      
                       , App.AppState
+                      , App.AWS.S3
                       , App.Kafka
                       , App.Options
                       , App.Orphans
@@ -74,6 +75,7 @@ library
                       , bifunctors
                       , bytestring
                       , conduit
+                      , conduit-extra
                       , containers
                       , datadog
                       , datadog-conduit
