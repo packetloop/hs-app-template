@@ -11,7 +11,7 @@ import Data.Monoid                  ((<>))
 import Kafka.Conduit
 
 
-mkConsumer :: (MonadIO m, MonadResource m) => Options -> m KafkaConsumer
+mkConsumer :: MonadResource m => Options -> m KafkaConsumer
 mkConsumer opts =
   let props = consumerBrokersList [opts ^. optKafkaBroker]
               <> groupId (opts ^. optGroupId)
@@ -21,14 +21,12 @@ mkConsumer opts =
       cons = newConsumer props sub >>= either throwM return
    in snd <$> allocate cons (void . closeConsumer)
 
-mkProducer :: (MonadIO m, MonadResource m) => Options -> m KafkaProducer
+mkProducer :: MonadResource m => Options -> m KafkaProducer
 mkProducer opts =
   let props = producerBrokersList [opts ^. optKafkaBroker]
               <> producerSuppressDisconnectLogs
       prod = newProducer props >>= either throwM return
    in snd <$> allocate prod closeProducer
 
-commitOffsetsSink :: MonadIO m
-                  => KafkaConsumer
-                  -> Sink i m ()
+commitOffsetsSink :: MonadIO m => KafkaConsumer -> Sink i m ()
 commitOffsetsSink c = awaitForever $ \_ -> commitAllOffsets OffsetCommit c

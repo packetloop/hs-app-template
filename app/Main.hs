@@ -33,7 +33,7 @@ main = do
 
     logInfo "Instantiating StatsD client"
     stats <- mkStatsClient (DogStatsSettings (opt ^. optStatsdHost) (opt ^. optStatsdPort))
-    stags <- liftIO $ statsTags opt
+    stags <- statsTags opt
     let statsSink = metricSink (MetricName "hw-app-template") (toTags stags) (opt ^. optSampleRate) stats
 
     logInfo "Running Kafka Consumer"
