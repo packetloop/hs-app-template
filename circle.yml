@@ -10,21 +10,42 @@ jobs:
 
     steps:
       - checkout
-      - restore_cache:
-          keys: 
-            - dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
-            - dot-stack
-      - restore_cache:
-          key: stack-work-{{ checksum "stack.yaml" }}
+      - run: grep '^resolver:' stack.yaml > resolver.txt
+
       - restore_cache:
           key: librdkafka-{{ checksum "scripts/build-librdkafka.sh" }}
-
       - run:
           name: Build librdkafka
           command: ./scripts/build-librdkafka.sh
+      - save_cache:
+          key: librdkafka-{{ checksum "scripts/build-librdkafka.sh" }}
+          paths: ~/hs-app-template/.librdkafka
 
+      - restore_cache:
+          keys: 
+            - dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
+            - dot-stack-{{ checksum "stack.yaml" }}
+            - dot-stack-base-{{ checksum "resolver.txt" }}
       - run: stack setup
+      - save_cache:
+          key: dot-stack-base-{{ checksum "resolver.txt" }}
+          paths:
+            - ~/.stack
+      - save_cache:
+          key: dot-stack-setup-{{ checksum "stack.yaml" }}
+          paths:
+            - ~/.stack
+
+      - restore_cache:
+          key: stack-work-{{ checksum "stack.yaml" }}
       - run: stack build --test --no-run-tests 
+      - save_cache:
+          key: dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
+          paths:
+            - ~/.stack
+      - save_cache:
+          key: stack-work-{{ checksum "stack.yaml" }}
+          paths: ~/hs-app-template/.stack-work
 
       - setup_remote_docker
       - run:
@@ -37,31 +58,12 @@ jobs:
             mv /tmp/docker/* /usr/bin
 
       - run:
-          name: Build the container
-          command: ./scripts/container.sh build
-
-
-      - run:
           name: Running unit tests
           command: stack test
 
-      - save_cache:
-          key: dot-stack-base
-          paths:
-            - ~/.stack
-
-      - save_cache:
-          key: dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
-          paths:
-            - ~/.stack
-
-      - save_cache:
-          key: stack-work-{{ checksum "stack.yaml" }}
-          paths: ~/hs-app-template/.stack-work
-
-      - save_cache:
-          key: librdkafka-{{ checksum "scripts/build-librdkafka.sh" }}
-          paths: ~/hs-app-template/.librdkafka
+      - run:
+          name: Build the container
+          command: ./scripts/container.sh build
 
       - deploy:
           name: Pushing container
