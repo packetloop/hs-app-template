@@ -22,7 +22,7 @@ jobs:
           paths: ~/hs-app-template/.librdkafka
 
       - restore_cache:
-          keys: 
+          keys:
             - dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
             - dot-stack-{{ checksum "stack.yaml" }}
             - dot-stack-base-{{ checksum "resolver.txt" }}
