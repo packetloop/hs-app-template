@@ -1,21 +1,24 @@
 {-# LANGUAGE TemplateHaskell #-}
 module App.Options where
 
-import Arbor.Datadog.Conduit (SampleRate (..), StatsTag (..))
 import Control.Lens
 import Control.Monad.Logger  (LogLevel (..))
 import Data.Semigroup        ((<>))
 import Network.AWS.Data.Text (FromText (..), fromText)
 import Network.AWS.S3.Types  (Region (..))
 import Network.Socket        (HostName)
+import Network.StatsD        (SampleRate (..))
 import Options.Applicative
 import Text.Read             (readEither)
 
 import Kafka.Consumer.Types
 import Kafka.Types
 
+import           Data.Text   (Text)
 import qualified Data.Text   as T
 import qualified Network.AWS as AWS
+
+newtype StatsTag = StatsTag (Text, Text) deriving (Show, Eq)
 
 data Options = Options
   { _optLogLevel              :: LogLevel

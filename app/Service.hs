@@ -1,7 +1,6 @@
 module Service
 where
 
-import Arbor.Datadog.Conduit
 import Arbor.Logger
 import Control.Arrow                        (left)
 import Control.Monad.IO.Class
@@ -12,6 +11,7 @@ import Data.Semigroup                       ((<>))
 import HaskellWorks.Data.Conduit.Combinator
 import Kafka.Avro                           (SchemaRegistry, decodeWithSchema)
 import Kafka.Conduit.Source
+import Network.StatsD
 
 import qualified Data.Conduit.List as L
 
@@ -22,13 +22,12 @@ import App
 -- Emit values downstream because offsets are committed based on their present.
 handleStream :: MonadApp m
              => SchemaRegistry
-             -> Sink Metric m ()
              -> Conduit (Either KafkaError (ConsumerRecord (Maybe ByteString) (Maybe ByteString))) m ()
-handleStream sr stats =
+handleStream sr =
   projectRights             -- getting rid of errors
   .| L.map crValue          -- extracting only value from consumer record
   .| L.catMaybes            -- discard empty values
-  .| tap (countStats (MetricName "messages.received") stats)
+  .| effect (sendMetric . addCounter (MetricName "messages.received") (const 1))
 --  .| L.mapM (decodeMessage sr)  -- decode avro message. Uncomment when needed.
   .| L.mapM (\x -> logInfo ("Received message: " <> show x))
 
