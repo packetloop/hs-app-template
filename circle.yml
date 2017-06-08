@@ -25,14 +25,21 @@ jobs:
           keys:
             - dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
             - dot-stack-{{ checksum "stack.yaml" }}
-            - dot-stack-base-{{ checksum "resolver.txt" }}
+            - dot-stack-{{ checksum "resolver.txt" }}
+            - dot-stack-resolver-{{ checksum "resolver.txt" }}
       - run: stack setup
       - save_cache:
-          key: dot-stack-base-{{ checksum "resolver.txt" }}
+          key: dot-stack-resolver-{{ checksum "resolver.txt" }}
           paths:
             - ~/.stack
       - save_cache:
           key: dot-stack-setup-{{ checksum "stack.yaml" }}
+          paths:
+            - ~/.stack
+
+      - run: stack build --test --no-run-tests --dependencies-only
+      - save_cache:
+          key: dot-stack-{{ checksum "resolver.txt" }}
           paths:
             - ~/.stack
 
