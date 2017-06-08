@@ -8,5 +8,5 @@ import Kafka.Types
 data AppError = KafkaErr KafkaError
               | DecodeErr DecodeError
               | AppErr String
-              deriving Show
+              deriving (Show, Eq)
 instance Exception AppError

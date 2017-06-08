@@ -8,7 +8,7 @@ packages:
   extra-dep: true
 - location:
     git: https://github.com/haskell-works/hw-kafka-conduit
-    commit: ab7b2498bfdd037ccc3aaff68d476e64acae9675
+    commit: e1ef4dc3e0b27e1f00ad612f2dfdaea895c5cafc
   extra-dep: true
 - location:
     git: https://github.com/haskell-works/hw-haskell-avro
@@ -16,23 +16,19 @@ packages:
   extra-dep: true
 - location:
     git: https://github.com/haskell-works/hw-kafka-avro
-    commit: 1c3ef79fa58082f7bae94ae34dee22d2b2c7045c
+    commit: 151c5dbfcc0901af823f6d99d23750524ef8abdf
   extra-dep: true
 - location:
     git: https://github.com/packetloop/datadog
-    commit: 9afb2e6322811af3c083a95436b4f358454c0273
+    commit: 1b42c7b89b5d433fb9420ce7b4010e124f9811a1
   extra-dep: true
-- location:
-    git: git@github.com:packetloop/datadog-conduit.git
-    commit: e74c20d508b50d75915ab569768026c4c29de7d2
-  extra-dep: True
 - location:
     git: git@github.com:packetloop/hs-arbor-logger.git
     commit: 5cb8c29152fd3a5c0a96ae6c02b21ee1fba9ec92
   extra-dep: true
 - location:
     git: https://github.com/haskell-works/hw-conduit
-    commit: 6e75e5b52b7cdf3d1f47312d4057932293f43672
+    commit: 56318097247c13a4850041a29e20fdc39e89ef95
   extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver
@@ -46,7 +42,7 @@ flags: {}
 
 extra-package-dbs: []
 
-# Added docker build configuration 
+# Added docker build configuration
 # but disabled docker build by default.
 # "stack --docker build" will use this configuration.
 docker:

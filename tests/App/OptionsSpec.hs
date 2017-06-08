@@ -4,8 +4,6 @@ module App.OptionsSpec
   ( spec
   ) where
 
-import Arbor.Datadog.Conduit (StatsTag (..))
-
 import App.Options
 
 import Test.Hspec
