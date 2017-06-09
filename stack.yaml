@@ -1,4 +1,4 @@
-resolver: lts-8.11
+resolver: lts-8.17
 
 packages:
 - '.'
@@ -20,7 +20,7 @@ packages:
   extra-dep: true
 - location:
     git: https://github.com/packetloop/datadog
-    commit: 1b42c7b89b5d433fb9420ce7b4010e124f9811a1
+    commit: d7c5b246e02677596ca03bf699c490d0c4470066
   extra-dep: true
 - location:
     git: git@github.com:packetloop/hs-arbor-logger.git
