@@ -21,17 +21,18 @@ import qualified Network.AWS as AWS
 newtype StatsTag = StatsTag (Text, Text) deriving (Show, Eq)
 
 data Options = Options
-  { _optLogLevel              :: LogLevel
-  , _optRegion                :: Region
-  , _optKafkaBroker           :: BrokerAddress
-  , _optCommandsTopic         :: TopicName
-  , _optGroupId               :: ConsumerGroupId
-  , _optSchemaRegistryAddress :: String
-  , _optKafkaPollTimeout      :: Int
-  , _optStatsdHost            :: HostName
-  , _optStatsdPort            :: Int
-  , _optStatsdTags            :: [StatsTag]
-  , _optSampleRate            :: SampleRate
+  { _optLogLevel                     :: LogLevel
+  , _optRegion                       :: Region
+  , _optKafkaBroker                  :: BrokerAddress
+  , _optCommandsTopic                :: TopicName
+  , _optGroupId                      :: ConsumerGroupId
+  , _optSchemaRegistryAddress        :: String
+  , _optKafkaPollTimeout             :: Int
+  , _optKafkaQueuedMaxMessagesKBytes :: Int
+  , _optStatsdHost                   :: HostName
+  , _optStatsdPort                   :: Int
+  , _optStatsdTags                   :: [StatsTag]
+  , _optSampleRate                   :: SampleRate
   } deriving (Show)
 
 makeLenses ''Options
@@ -80,6 +81,12 @@ options = Options
        <> metavar "KAFKA_POLL_TIMEOUT"
        <> showDefault <> value 1000
        <> help "Kafka poll timeout")
+  <*> readOption
+       (  long "kafka-queued-max-messages-kbytes"
+       <> short 'q'
+       <> metavar "KAFKA_QUEUED_MAX_MESSAGES_KBYTES"
+       <> showDefault <> value 100000
+       <> help "Kafka queued.max.messages.kbytes")
   <*> strOption
        (  long "statsd-host"
        <> short 's'

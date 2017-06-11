@@ -17,6 +17,7 @@ mkConsumer opts =
               <> groupId (opts ^. optGroupId)
               <> noAutoCommit
               <> consumerSuppressDisconnectLogs
+              <> consumerQueuedMaxMessagesKBytes (opts ^. optKafkaQueuedMaxMessagesKBytes)
       sub = topics [opts ^. optCommandsTopic] <> offsetReset Earliest
       cons = newConsumer props sub >>= either throwM return
    in snd <$> allocate cons (void . closeConsumer)
