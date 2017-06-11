@@ -4,7 +4,7 @@ packages:
 - '.'
 - location:
     git: https://github.com/haskell-works/hw-kafka-client
-    commit: 27bf3b295b148a34d1927a2ab092ff42554aadb9
+    commit: a74e4f45233eed780a8bdc089f6db786c04e04f8
   extra-dep: true
 - location:
     git: https://github.com/haskell-works/hw-kafka-conduit
