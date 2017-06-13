@@ -14,7 +14,7 @@ import Kafka.Conduit
 mkConsumer :: MonadResource m => Options -> m KafkaConsumer
 mkConsumer opts =
   let props = consumerBrokersList [opts ^. optKafkaBroker]
-              <> groupId (opts ^. optGroupId)
+              <> groupId (opts ^. optKafkaGroupId)
               <> noAutoCommit
               <> consumerSuppressDisconnectLogs
               <> consumerQueuedMaxMessagesKBytes (opts ^. optKafkaQueuedMaxMessagesKBytes)

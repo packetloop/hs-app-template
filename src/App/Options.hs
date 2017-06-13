@@ -24,11 +24,11 @@ data Options = Options
   { _optLogLevel                     :: LogLevel
   , _optRegion                       :: Region
   , _optKafkaBroker                  :: BrokerAddress
-  , _optCommandsTopic                :: TopicName
-  , _optGroupId                      :: ConsumerGroupId
-  , _optSchemaRegistryAddress        :: String
+  , _optKafkaSchemaRegistryAddress   :: String
   , _optKafkaPollTimeout             :: Int
   , _optKafkaQueuedMaxMessagesKBytes :: Int
+  , _optKafkaGroupId                 :: ConsumerGroupId
+  , _optCommandsTopic                :: TopicName
   , _optStatsdHost                   :: HostName
   , _optStatsdPort                   :: Int
   , _optStatsdTags                   :: [StatsTag]
@@ -40,78 +40,76 @@ makeLenses ''Options
 options :: Parser Options
 options = Options
   <$> readOptionMsg "Valid values are LevelDebug, LevelInfo, LevelWarn, LevelError"
-       (  long "log-level"
-       <> short 'l'
-       <> metavar "LOG_LEVEL"
-       <> showDefault <> value LevelInfo
-       <> help "Log level.")
+        (  long "log-level"
+        <> short 'l'
+        <> metavar "LOG_LEVEL"
+        <> showDefault <> value LevelInfo
+        <> help "Log level.")
   <*> readOrFromTextOption
-      (  long "region"
-      <> short 'r'
-      <> metavar "AWS_REGION"
-      <> showDefault <> value Oregon
-      <> help "The AWS region in which to operate"
-      )
-  <*> (BrokerAddress <$> strOption
-        (  long "bootstrap-broker"
+        (  long "region"
+        <> short 'r'
+        <> metavar "AWS_REGION"
+        <> showDefault <> value Oregon
+        <> help "The AWS region in which to operate"
+        )
+  <*> ( BrokerAddress <$> strOption
+        (  long "kafka-broker"
         <> short 'b'
         <> metavar "ADDRESS:PORT"
         <> help "Kafka bootstrap broker"
         ))
-  <*>  (TopicName <$> strOption
+  <*> strOption
+        (  long "kafka-schema-registry"
+        <> short 'r'
+        <> metavar "HTTP_URL:PORT"
+        <> help "Schema registry address")
+  <*> readOption
+        (  long "kafka-poll-timeout"
+        <> short 'u'
+        <> metavar "KAFKA_POLL_TIMEOUT"
+        <> showDefault <> value 1000
+        <> help "Kafka poll timeout")
+  <*> readOption
+        (  long "kafka-queued-max-messages-kbytes"
+        <> short 'q'
+        <> metavar "KAFKA_QUEUED_MAX_MESSAGES_KBYTES"
+        <> showDefault <> value 100000
+        <> help "Kafka queued.max.messages.kbytes")
+  <*> ( ConsumerGroupId <$> strOption
+        (  long "kafka-group-id"
+        <> short 'g'
+        <> metavar "GROUP_ID"
+        <> help "Kafka consumer group id"))
+  <*> ( TopicName <$> strOption
         (  long "commands-topic"
         <> short 'i'
         <> metavar "TOPIC"
         <> help "Commands topic"))
-  <*> (ConsumerGroupId <$> strOption
-        (  long "group-id"
-        <> short 'g'
-        <> metavar "GROUP_ID"
-        <> help "Kafka consumer group id"
-        ))
   <*> strOption
-        (  long "schema-registry"
-        <> short 'r'
-        <> metavar "HTTP_URL:PORT"
-        <> help "Schema registry address"
-        )
+        (  long "statsd-host"
+        <> short 's'
+        <> metavar "HOST_NAME"
+        <> showDefault <> value "127.0.0.1"
+        <> help "StatsD host name or IP address")
   <*> readOption
-       (  long "poll-timeout"
-       <> short 'u'
-       <> metavar "KAFKA_POLL_TIMEOUT"
-       <> showDefault <> value 1000
-       <> help "Kafka poll timeout")
-  <*> readOption
-       (  long "kafka-queued-max-messages-kbytes"
-       <> short 'q'
-       <> metavar "KAFKA_QUEUED_MAX_MESSAGES_KBYTES"
-       <> showDefault <> value 100000
-       <> help "Kafka queued.max.messages.kbytes")
-  <*> strOption
-       (  long "statsd-host"
-       <> short 's'
-       <> metavar "HOST_NAME"
-       <> showDefault <> value "127.0.0.1"
-       <> help "StatsD host name or IP address")
-  <*> readOption
-       (  long "statsd-port"
-       <> short 'p'
-       <> metavar "PORT"
-       <> showDefault <> value 8125
-       <> help "StatsD port"
-       <> hidden)
+        (  long "statsd-port"
+        <> short 'p'
+        <> metavar "PORT"
+        <> showDefault <> value 8125
+        <> help "StatsD port"
+        <> hidden)
   <*> ( string2Tags <$> strOption
-       (  long "statsd-tags"
-       <> short 't'
-       <> metavar "TAGS"
-       <> showDefault <> value []
-       <> help "StatsD tags"))
-  <*> (SampleRate <$> readOption
-      (  long "statsd-sample-rate"
-      <> short 'a'
-      <> metavar "SAMPLE_RATE"
-      <> showDefault <> value 0.01
-      <> help "StatsD sample rate"))
+        (  long "statsd-tags"
+        <> short 't'
+        <> metavar "TAGS"
+        <> showDefault <> value []
+        <> help "StatsD tags"))
+  <*> ( SampleRate <$> readOption
+        (  long "statsd-sample-rate"
+        <> short 'a'
+        <> metavar "SAMPLE_RATE"
+        <> showDefault <> value 0.01
+        <> help "StatsD sample rate"))
 
 awsLogLevel :: Options -> AWS.LogLevel
 awsLogLevel o = case o ^. optLogLevel of
