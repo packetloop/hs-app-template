@@ -10,6 +10,7 @@ jobs:
 
     steps:
       - checkout
+      - run: git fetch --unshallow || true
       - run: grep '^resolver:' stack.yaml > resolver.txt
 
       - restore_cache:
