@@ -3,23 +3,23 @@ resolver: lts-8.17
 packages:
 - '.'
 - location:
-    git: https://github.com/haskell-works/hw-kafka-client
+    git: git@github.com:haskell-works/hw-kafka-client.git
     commit: a74e4f45233eed780a8bdc089f6db786c04e04f8
   extra-dep: true
 - location:
-    git: https://github.com/haskell-works/hw-kafka-conduit
+    git: git@github.com:haskell-works/hw-kafka-conduit.git
     commit: e1ef4dc3e0b27e1f00ad612f2dfdaea895c5cafc
   extra-dep: true
 - location:
-    git: https://github.com/haskell-works/hw-haskell-avro
+    git: git@github.com:haskell-works/hw-haskell-avro.git
     commit: 8b9420f5e1a0495c2717ce5cfe97c537ef3417a1
   extra-dep: true
 - location:
-    git: https://github.com/haskell-works/hw-kafka-avro
+    git: git@github.com:haskell-works/hw-kafka-avro.git
     commit: 151c5dbfcc0901af823f6d99d23750524ef8abdf
   extra-dep: true
 - location:
-    git: https://github.com/packetloop/datadog
+    git: git@github.com:packetloop/datadog.git
     commit: d7c5b246e02677596ca03bf699c490d0c4470066
   extra-dep: true
 - location:
@@ -27,7 +27,7 @@ packages:
     commit: 5cb8c29152fd3a5c0a96ae6c02b21ee1fba9ec92
   extra-dep: true
 - location:
-    git: https://github.com/haskell-works/hw-conduit
+    git: git@github.com:haskell-works/hw-conduit.git
     commit: 56318097247c13a4850041a29e20fdc39e89ef95
   extra-dep: true
 
