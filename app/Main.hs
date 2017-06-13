@@ -21,7 +21,7 @@ main = do
   void . runApplication "hw-app-template" env opt $ do
 
     logInfo "Instantiating Schema Registry"
-    sr <- schemaRegistry (opt ^. optSchemaRegistryAddress)
+    sr <- schemaRegistry (opt ^. optKafkaSchemaRegistryAddress)
 
     logInfo "Creating Kafka Consumer"
     consumer <- mkConsumer opt

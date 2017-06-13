@@ -7,10 +7,9 @@ stack build
 path=$(stack path --local-install-root)
 
 ${path}/bin/${exe} \
-  --bootstrap-broker localhost:9092 \
-  --group-id local-group \
-  --schema-registry http://localhost:8081 \
+  --kafka-broker localhost:9092 \
+  --kafka-group-id local-group \
+  --kafka-schema-registry http://localhost:8081 \
   --commands-topic commands \
-  --poll-timeout 10000 \
+  --kafka-poll-timeout 10000 \
   --log-level LevelDebug
-

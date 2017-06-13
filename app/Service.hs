@@ -23,7 +23,7 @@ import App
 handleStream :: MonadApp m
              => SchemaRegistry
              -> Conduit (Either KafkaError (ConsumerRecord (Maybe ByteString) (Maybe ByteString))) m ()
-handleStream sr =
+handleStream _ =
   projectRights             -- getting rid of errors
   .| L.map crValue          -- extracting only value from consumer record
   .| L.catMaybes            -- discard empty values
