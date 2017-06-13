@@ -12,7 +12,7 @@ export STATSD_HOST=${STATSD_HOST:-$GATEWAY_IP}
 set -x
 hs-app-template \
   ${AWS_REGION+                       --region                            "${AWS_REGION}"                       } \
-  ${KAFKA_BOOTSTRAP+                  --kafka-broker                      "${KAFKA_BROKER}"                     } \
+  ${KAFKA_BROKER+                     --kafka-broker                      "${KAFKA_BROKER}"                     } \
   ${KAFKA_GROUP_ID+                   --kafka-group-id                    "${KAFKA_GROUP_ID}"                   } \
   ${KAFKA_SCHEMA_REGISTRY+            --kafka-schema-registry             "${KAFKA_SCHEMA_REGISTRY}"            } \
   ${KAFKA_POLL_TIMEOUT+               --kafka-poll-timeout                "${KAFKA_POLL_TIMEOUT}"               } \
