@@ -3,10 +3,10 @@ version:             1.0.0
 -- synopsis:
 -- description:
 homepage:            https://github.com/packetloop/hs-app-template#readme
-license:             BSD3
+license:             MIT
 license-file:        LICENSE
-author:              Tyler Durden
-maintainer:          tyler.durden@arbor.net
+author:              Arbor Networks
+maintainer:          mayhem@arbor.net
 copyright:           Arbor Networks
 category:            Services
 build-type:          Simple
