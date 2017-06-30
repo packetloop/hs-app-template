@@ -1,5 +1,7 @@
 module Main where
 
+import App
+import App.Kafka
 import Arbor.Logger
 import Control.Lens
 import Control.Monad                        (void)
@@ -8,18 +10,18 @@ import Data.Conduit
 import HaskellWorks.Data.Conduit.Combinator
 import Kafka.Avro                           (schemaRegistry)
 import Kafka.Conduit.Source
+import System.Environment
 import System.IO                            (stdout)
 
-import App
-import App.Kafka
-import Service   as Srv
+import qualified Data.Text as T
+import qualified Service   as Srv
 
 main :: IO ()
 main = do
   opt <- parseOptions
   env <- mkEnv opt
-  void . runApplication "hw-app-template" env opt $ do
-
+  progName <- T.pack <$> getProgName
+  void . runApplication progName env opt $ do
     logInfo "Instantiating Schema Registry"
     sr <- schemaRegistry (opt ^. optKafkaSchemaRegistryAddress)
 
