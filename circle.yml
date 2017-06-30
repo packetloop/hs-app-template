@@ -38,15 +38,15 @@ jobs:
           paths:
             - ~/.stack
 
+      - restore_cache:
+          key: stack-work-{{ checksum "stack.yaml" }}
       - run: stack build --test --no-run-tests --dependencies-only
       - save_cache:
           key: dot-stack-{{ checksum "resolver.txt" }}
           paths:
             - ~/.stack
 
-      - restore_cache:
-          key: stack-work-{{ checksum "stack.yaml" }}
-      - run: stack build --test --no-run-tests 
+      - run: stack build --test --no-run-tests
       - save_cache:
           key: dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
           paths:
