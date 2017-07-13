@@ -30,7 +30,7 @@ main = do
 
     logInfo "Running Kafka Consumer"
     runConduit $
-      kafkaSourceNoClose consumer (Timeout (opt ^. optKafkaPollTimeout))
+      kafkaSourceNoClose consumer (Timeout $ opt ^. optKafkaPollTimeoutMs)
       .| throwLeftSatisfy isFatal             -- throw any fatal error
       .| skipNonFatalExcept [isPollTimeout]   -- discard any non-fatal except poll timeouts
       .| Srv.handleStream sr                  -- handle messages (see Service.hs)

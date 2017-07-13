@@ -15,7 +15,7 @@ hs-app-template \
   ${KAFKA_BROKER+                     --kafka-broker                      "${KAFKA_BROKER}"                     } \
   ${KAFKA_GROUP_ID+                   --kafka-group-id                    "${KAFKA_GROUP_ID}"                   } \
   ${KAFKA_SCHEMA_REGISTRY+            --kafka-schema-registry             "${KAFKA_SCHEMA_REGISTRY}"            } \
-  ${KAFKA_POLL_TIMEOUT+               --kafka-poll-timeout                "${KAFKA_POLL_TIMEOUT}"               } \
+  ${KAFKA_POLL_TIMEOUT_MS+            --kafka-poll-timeout-ms             "${KAFKA_POLL_TIMEOUT_MS}"            } \
   ${KAFKA_QUEUED_MAX_MESSAGES_KBYTES+ --kafka-queued-max-messages-kbytes  "${KAFKA_QUEUED_MAX_MESSAGES_KBYTES}" } \
   ${COMMANDS_TOPIC_IN+                --commands-topic                    "${COMMANDS_TOPIC_IN}"                } \
   ${STATSD_HOST+                      --statsd-host                       "${STATSD_HOST}"                      } \

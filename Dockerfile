@@ -25,7 +25,7 @@ ADD .stack-work/install/x86_64-linux*/*/*/bin/* /usr/local/bin/
 
 # REQUIRE LOG_LEVEL                           LevelDebug
 
-# REQUIRE KAFKA_POLL_TIMEOUT                  1.0
+# REQUIRE KAFKA_POLL_TIMEOUT_MS               1000
 # REQUIRE KAFKA_GROUP_ID                      group-id
 # REQUIRE KAFKA_BROKER                        hostnames
 # REQUIRE KAFKA_SCHEMA_REGISTRY               url
