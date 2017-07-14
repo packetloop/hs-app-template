@@ -10,6 +10,7 @@ import Data.Conduit
 import HaskellWorks.Data.Conduit.Combinator
 import Kafka.Avro                           (schemaRegistry)
 import Kafka.Conduit.Source
+import Kafka.Conduit.Sink
 import System.Environment
 import System.IO                            (stdout)
 
@@ -27,16 +28,19 @@ main = do
 
     logInfo "Creating Kafka Consumer"
     consumer <- mkConsumer opt
+    -- producer <- mkProducer opt -- Use this if you also want a producer.
 
     logInfo "Running Kafka Consumer"
     runConduit $
       kafkaSourceNoClose consumer (Timeout $ opt ^. optKafkaPollTimeoutMs)
-      .| throwLeftSatisfy isFatal             -- throw any fatal error
-      .| skipNonFatalExcept [isPollTimeout]   -- discard any non-fatal except poll timeouts
-      .| Srv.handleStream sr                  -- handle messages (see Service.hs)
-      .| everyN 100                           -- after every 100 messages commit offsets
+      .| throwLeftSatisfy isFatal                   -- throw any fatal error
+      .| skipNonFatalExcept [isPollTimeout]         -- discard any non-fatal except poll timeouts
+      .| Srv.handleStream sr                        -- handle messages (see Service.hs)
+      -- .| batchByOrFlushEither (opt ^. optBatchSize) -- Use this if you also want a producer.
       .| everyNSeconds (opt ^. optKafkaConsumerCommitPeriodSec)  -- only commit ever N seconds, so we don't hammer Kafka.
       .| commitOffsetsSink consumer
+      -- .| flushThenCommitSink consumer producer -- Swap with the above if you want a producer.
+
 
     logError "Premature exit, must not happen."
 

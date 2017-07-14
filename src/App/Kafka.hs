@@ -4,9 +4,7 @@ where
 import App.Options
 import Control.Lens                 hiding (cons)
 import Control.Monad                (void)
-import Control.Monad.IO.Class
 import Control.Monad.Trans.Resource
-import Data.Conduit
 import Data.Monoid                  ((<>))
 import Kafka.Conduit
 
@@ -28,6 +26,3 @@ mkProducer opts =
               <> producerSuppressDisconnectLogs
       prod = newProducer props >>= either throwM return
    in snd <$> allocate prod closeProducer
-
-commitOffsetsSink :: MonadIO m => KafkaConsumer -> Sink i m ()
-commitOffsetsSink c = awaitForever $ \_ -> commitAllOffsets OffsetCommit c

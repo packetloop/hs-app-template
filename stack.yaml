@@ -28,7 +28,7 @@ packages:
   extra-dep: true
 - location:
     git: git@github.com:haskell-works/hw-conduit.git
-    commit: 56318097247c13a4850041a29e20fdc39e89ef95
+    commit: f059af6a0b9e99941ba5c5dc7c7ab9cf0b47cd67
   extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver
