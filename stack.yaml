@@ -8,7 +8,7 @@ packages:
   extra-dep: true
 - location:
     git: git@github.com:haskell-works/hw-kafka-conduit.git
-    commit: e1ef4dc3e0b27e1f00ad612f2dfdaea895c5cafc
+    commit: 701f8cf166444019de174d7426414899a236dcfc
   extra-dep: true
 - location:
     git: git@github.com:haskell-works/hw-haskell-avro.git
@@ -28,7 +28,7 @@ packages:
   extra-dep: true
 - location:
     git: git@github.com:haskell-works/hw-conduit.git
-    commit: 56318097247c13a4850041a29e20fdc39e89ef95
+    commit: f059af6a0b9e99941ba5c5dc7c7ab9cf0b47cd67
   extra-dep: true
 
 # Dependency packages to be pulled from upstream that are not in the resolver

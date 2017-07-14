@@ -25,9 +25,10 @@ data Options = Options
   , _optRegion                       :: Region
   , _optKafkaBroker                  :: BrokerAddress
   , _optKafkaSchemaRegistryAddress   :: String
-  , _optKafkaPollTimeout             :: Int
+  , _optKafkaPollTimeoutMs           :: Int
   , _optKafkaQueuedMaxMessagesKBytes :: Int
   , _optKafkaGroupId                 :: ConsumerGroupId
+  , _optKafkaConsumerCommitPeriodSec :: Int
   , _optCommandsTopic                :: TopicName
   , _optStatsdHost                   :: HostName
   , _optStatsdPort                   :: Int
@@ -64,11 +65,11 @@ options = Options
         <> metavar "HTTP_URL:PORT"
         <> help "Schema registry address")
   <*> readOption
-        (  long "kafka-poll-timeout"
+        (  long "kafka-poll-timeout-ms"
         <> short 'u'
-        <> metavar "KAFKA_POLL_TIMEOUT"
+        <> metavar "KAFKA_POLL_TIMEOUT_MS"
         <> showDefault <> value 1000
-        <> help "Kafka poll timeout")
+        <> help "Kafka poll timeout (in milliseconds)")
   <*> readOption
         (  long "kafka-queued-max-messages-kbytes"
         <> short 'q'
@@ -80,6 +81,13 @@ options = Options
         <> short 'g'
         <> metavar "GROUP_ID"
         <> help "Kafka consumer group id"))
+  <*> readOption
+        (  long "kafka-consumer-commit-period-sec"
+        <> short 'c'
+        <> metavar "KAFKA_CONSUMER_COMMIT_PERIOD_SEC"
+        <> showDefault <> value 60
+        <> help "Kafka consumer offsets commit period (in seconds)"
+        )
   <*> ( TopicName <$> strOption
         (  long "commands-topic"
         <> short 'i'

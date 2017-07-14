@@ -11,5 +11,5 @@ ${path}/bin/${exe} \
   --kafka-group-id local-group \
   --kafka-schema-registry http://localhost:8081 \
   --commands-topic commands \
-  --kafka-poll-timeout 10000 \
+  --kafka-poll-timeout-ms 10000 \
   --log-level LevelDebug
