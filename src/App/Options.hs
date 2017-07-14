@@ -28,6 +28,7 @@ data Options = Options
   , _optKafkaPollTimeoutMs           :: Int
   , _optKafkaQueuedMaxMessagesKBytes :: Int
   , _optKafkaGroupId                 :: ConsumerGroupId
+  , _optKafkaConsumerCommitPeriodSec :: Int
   , _optCommandsTopic                :: TopicName
   , _optStatsdHost                   :: HostName
   , _optStatsdPort                   :: Int
@@ -80,6 +81,13 @@ options = Options
         <> short 'g'
         <> metavar "GROUP_ID"
         <> help "Kafka consumer group id"))
+  <*> readOption
+        (  long "kafka-consumer-commit-period-sec"
+        <> short 'c'
+        <> metavar "KAFKA_CONSUMER_COMMIT_PERIOD_SEC"
+        <> showDefault <> value 60
+        <> help "Kafka consumer offsets commit period (in seconds)"
+        )
   <*> ( TopicName <$> strOption
         (  long "commands-topic"
         <> short 'i'

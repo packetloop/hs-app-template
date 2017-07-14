@@ -8,7 +8,7 @@ packages:
   extra-dep: true
 - location:
     git: git@github.com:haskell-works/hw-kafka-conduit.git
-    commit: e1ef4dc3e0b27e1f00ad612f2dfdaea895c5cafc
+    commit: 701f8cf166444019de174d7426414899a236dcfc
   extra-dep: true
 - location:
     git: git@github.com:haskell-works/hw-haskell-avro.git

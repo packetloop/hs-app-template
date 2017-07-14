@@ -35,6 +35,7 @@ main = do
       .| skipNonFatalExcept [isPollTimeout]   -- discard any non-fatal except poll timeouts
       .| Srv.handleStream sr                  -- handle messages (see Service.hs)
       .| everyN 100                           -- after every 100 messages commit offsets
+      .| everyNSeconds (opt ^. optKafkaConsumerCommitPeriodSec)  -- only commit ever N seconds, so we don't hammer Kafka.
       .| commitOffsetsSink consumer
 
     logError "Premature exit, must not happen."
