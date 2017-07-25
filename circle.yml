@@ -34,7 +34,7 @@ jobs:
           paths:
             - ~/.stack
       - save_cache:
-          key: dot-stack-setup-{{ checksum "stack.yaml" }}
+          key: dot-stack-{{ checksum "stack.yaml" }}
           paths:
             - ~/.stack
 
