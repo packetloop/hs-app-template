@@ -28,6 +28,7 @@ data Options = Options
   , _optKafkaPollTimeoutMs           :: Int
   , _optKafkaQueuedMaxMessagesKBytes :: Int
   , _optKafkaGroupId                 :: ConsumerGroupId
+  , _optKafkaDebugEnable             :: String
   , _optKafkaConsumerCommitPeriodSec :: Int
   , _optCommandsTopic                :: TopicName
   , _optStatsdHost                   :: HostName
@@ -81,6 +82,13 @@ options = Options
         <> short 'g'
         <> metavar "GROUP_ID"
         <> help "Kafka consumer group id"))
+  <*> strOption
+        (  long "kafka-debug-enable"
+        <> short 'd'
+        <> metavar "KAFKA_DEBUG_ENABLE"
+        <> showDefault <> value "broker,protocol"
+        <> help "Kafka debug modules, comma separated names: see debug in CONFIGURATION.md"
+        )
   <*> readOption
         (  long "kafka-consumer-commit-period-sec"
         <> short 'c'

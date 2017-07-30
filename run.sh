@@ -12,4 +12,5 @@ ${path}/bin/${exe} \
   --kafka-schema-registry http://localhost:8081 \
   --commands-topic commands \
   --kafka-poll-timeout-ms 10000 \
+  --kafka-debug-enable "broker,protocol" \
   --log-level LevelDebug

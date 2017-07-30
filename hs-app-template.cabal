@@ -94,6 +94,7 @@ library
                       , optparse-applicative
                       , random
                       , resourcet
+                      , split
                       , text
                       , transformers
                       , transformers-base

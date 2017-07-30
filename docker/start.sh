@@ -17,6 +17,7 @@ hs-app-template \
   ${KAFKA_SCHEMA_REGISTRY+            --kafka-schema-registry             "${KAFKA_SCHEMA_REGISTRY}"            } \
   ${KAFKA_POLL_TIMEOUT_MS+            --kafka-poll-timeout-ms             "${KAFKA_POLL_TIMEOUT_MS}"            } \
   ${KAFKA_QUEUED_MAX_MESSAGES_KBYTES+ --kafka-queued-max-messages-kbytes  "${KAFKA_QUEUED_MAX_MESSAGES_KBYTES}" } \
+  ${KAFKA_DEBUG_ENABLE+               --kafka-debug-enable                "${KAFKA_DEBUG_ENABLE}"               } \
   ${KAFKA_CONSUMER_COMMIT_PERIOD_SEC+ --kafka-consumer-commit-period-sec  "${KAFKA_CONSUMER_COMMIT_PERIOD_SEC}" } \
   ${COMMANDS_TOPIC_IN+                --commands-topic                    "${COMMANDS_TOPIC_IN}"                } \
   ${STATSD_HOST+                      --statsd-host                       "${STATSD_HOST}"                      } \
