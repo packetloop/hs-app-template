@@ -3,12 +3,12 @@ module Service
   )
 where
 
-import Control.Arrow                        (left)
+import Control.Arrow          (left)
 import Control.Monad.IO.Class
-import Data.ByteString                      (ByteString)
-import Data.ByteString.Lazy                 (fromStrict)
+import Data.ByteString        (ByteString)
+import Data.ByteString.Lazy   (fromStrict)
 import Data.Conduit
-import Kafka.Avro                           (SchemaRegistry, decodeWithSchema)
+import Kafka.Avro             (SchemaRegistry, decodeWithSchema)
 import Kafka.Conduit.Source
 
 import qualified Data.Conduit.List as L
@@ -35,5 +35,5 @@ decodeMessage :: MonadIO m => SchemaRegistry -> ByteString -> m (Either AppError
 decodeMessage sr bs = left DecodeErr <$> decodeWithSchema sr (fromStrict bs)
 
 bindM :: Monad m => (b -> m (Either a c)) -> Either a b -> m (Either a c)
-bindM _ (Left a) = return $ Left a
+bindM _ (Left a)  = return $ Left a
 bindM f (Right b) = f b

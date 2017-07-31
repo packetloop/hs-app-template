@@ -1,5 +1,6 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module App.AWS.S3
-( downloadLBS
+( downloadLBS, downloadLBS'
 , putFile, copySingle
 , BucketName(..)
 , ObjectKey(..)
@@ -9,15 +10,17 @@ module App.AWS.S3
 
 import Control.Lens
 import Control.Monad
+import Control.Monad.Catch          (catch)
 import Control.Monad.Trans.AWS      hiding (send)
 import Control.Monad.Trans.Resource
-import Data.ByteString.Lazy         (ByteString)
+import Data.ByteString.Lazy         (ByteString, empty)
 import Data.Conduit.Binary          (sinkLbs)
 import Data.Monoid                  ((<>))
 import Data.Text                    (unpack)
-import Network.AWS                  (MonadAWS, send)
+import Network.AWS                  (Error (..), MonadAWS, ServiceError (..), send)
 import Network.AWS.Data
 import Network.AWS.S3
+import Network.HTTP.Types.Status    (Status (..))
 
 chunkSize :: ChunkSize
 chunkSize = ChunkSize (1024*1024)
@@ -29,6 +32,19 @@ downloadLBS :: (MonadResource m, MonadAWS m)
 downloadLBS bucketName objectKey = do
   resp <- send $ getObject bucketName objectKey
   (resp ^. gorsBody) `sinkBody` sinkLbs
+
+downloadLBS' :: (MonadResource m, MonadAWS m)
+            => BucketName
+            -> ObjectKey
+            -> m (Maybe ByteString)
+downloadLBS' bucketName objectKey = do
+  ebs <- (Right <$> downloadLBS bucketName objectKey) `catch` \(e :: Error) -> case e of
+    (ServiceError (ServiceError' _ (Status 404 _) _ _ _ _)) -> return (Left empty)
+    _                                                       -> throwM e
+  case ebs of
+    Right bs -> return (Just bs)
+    Left _   -> return Nothing
+
 
 s3UriString :: BucketName -> ObjectKey -> String
 s3UriString (BucketName b) (ObjectKey k) =

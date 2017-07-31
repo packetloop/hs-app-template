@@ -82,6 +82,7 @@ library
                       , exceptions
                       , fast-logger
                       , hs-arbor-logger
+                      , http-types
                       , hw-conduit
                       , hw-kafka-avro
                       , hw-kafka-client

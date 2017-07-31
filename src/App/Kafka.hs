@@ -23,7 +23,7 @@ mkConsumer opts =
         , consumerLogLevel (kafkaLogLevel (opts ^. optLogLevel))
         , consumerDebug (kafkaDebugEnable (opts ^. optKafkaDebugEnable))
         ]
-      sub = topics [opts ^. optCommandsTopic] <> offsetReset Earliest
+      sub = topics [opts ^. optInputTopic] <> offsetReset Earliest
       cons = newConsumer props sub >>= either throwM return
    in snd <$> allocate cons (void . closeConsumer)
 
