@@ -9,8 +9,8 @@ import Control.Monad.Trans.AWS
 import Data.Conduit
 import HaskellWorks.Data.Conduit.Combinator
 import Kafka.Avro                           (schemaRegistry)
-import Kafka.Conduit.Source
 import Kafka.Conduit.Sink
+import Kafka.Conduit.Source
 import System.Environment
 import System.IO                            (stdout)
 
@@ -32,7 +32,7 @@ main = do
 
     logInfo "Running Kafka Consumer"
     runConduit $
-      kafkaSourceNoClose consumer (Timeout $ opt ^. optKafkaPollTimeoutMs)
+      kafkaSourceNoClose consumer (opt ^. optKafkaPollTimeoutMs)
       .| throwLeftSatisfy isFatal                   -- throw any fatal error
       .| skipNonFatalExcept [isPollTimeout]         -- discard any non-fatal except poll timeouts
       .| Srv.handleStream sr                        -- handle messages (see Service.hs)

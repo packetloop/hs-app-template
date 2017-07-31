@@ -25,12 +25,12 @@ data Options = Options
   , _optRegion                       :: Region
   , _optKafkaBroker                  :: BrokerAddress
   , _optKafkaSchemaRegistryAddress   :: String
-  , _optKafkaPollTimeoutMs           :: Int
+  , _optKafkaPollTimeoutMs           :: Timeout
   , _optKafkaQueuedMaxMessagesKBytes :: Int
   , _optKafkaGroupId                 :: ConsumerGroupId
   , _optKafkaDebugEnable             :: String
   , _optKafkaConsumerCommitPeriodSec :: Int
-  , _optCommandsTopic                :: TopicName
+  , _optInputTopic                   :: TopicName
   , _optStatsdHost                   :: HostName
   , _optStatsdPort                   :: Int
   , _optStatsdTags                   :: [StatsTag]
@@ -65,12 +65,12 @@ options = Options
         <> short 'r'
         <> metavar "HTTP_URL:PORT"
         <> help "Schema registry address")
-  <*> readOption
+  <*> (Timeout <$> readOption
         (  long "kafka-poll-timeout-ms"
         <> short 'u'
         <> metavar "KAFKA_POLL_TIMEOUT_MS"
         <> showDefault <> value 1000
-        <> help "Kafka poll timeout (in milliseconds)")
+        <> help "Kafka poll timeout (in milliseconds)"))
   <*> readOption
         (  long "kafka-queued-max-messages-kbytes"
         <> short 'q'
@@ -97,10 +97,10 @@ options = Options
         <> help "Kafka consumer offsets commit period (in seconds)"
         )
   <*> ( TopicName <$> strOption
-        (  long "commands-topic"
+        (  long "input-topic"
         <> short 'i'
         <> metavar "TOPIC"
-        <> help "Commands topic"))
+        <> help "Input topic"))
   <*> strOption
         (  long "statsd-host"
         <> short 's'
