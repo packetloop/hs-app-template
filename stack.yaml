@@ -1,4 +1,4 @@
-resolver: lts-9.0
+resolver: lts-9.1
 
 packages:
 - '.'
@@ -12,7 +12,7 @@ packages:
   extra-dep: true
 - location:
     git: git@github.com:packetloop/hs-arbor-logger.git
-    commit: 5cb8c29152fd3a5c0a96ae6c02b21ee1fba9ec92
+    commit: 85f56acbd43625793b09aa5281c6224a7cca7d76
   extra-dep: true
 - location:
     git: git@github.com:haskell-works/hw-hedgehog.git

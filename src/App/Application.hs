@@ -58,17 +58,21 @@ deriving instance MonadApp Application
 instance MonadStats Application where
   getStatsClient = reader _appStatsClient
 
-runApplication :: HasEnv e => AppName -> e -> Options -> Application () -> IO AppState
-runApplication appName e opt val =
-  runResourceT . runAWS e . runLogT' (opt ^. optLogLevel) . flip execStateT appStateEmpty $ do
-    logInfo $ show opt
+runApplication :: HasEnv e => AppName -> e -> Options -> TimedFastLogger -> Application () -> IO AppState
+runApplication appName e opt logger val =
+  runResourceT
+    . runAWS e
+    . runTimedLogT (opt ^. optLogLevel) logger
+    . flip execStateT appStateEmpty
+    $ do
+        logInfo $ show opt
 
-    logInfo "Instantiating StatsD client"
-    globalTags <- statsTags opt
-    let statsOpts = DogStatsSettings (opt ^. optStatsdHost) (opt ^. optStatsdPort)
-    (_, stats) <- allocate (createStatsClient statsOpts (MetricName appName) globalTags) closeStatsClient
+        logInfo "Instantiating StatsD client"
+        globalTags <- statsTags opt
+        let statsOpts = DogStatsSettings (opt ^. optStatsdHost) (opt ^. optStatsdPort)
+        (_, stats) <- allocate (createStatsClient statsOpts (MetricName appName) globalTags) closeStatsClient
 
-    runReaderT (unApp val) (AppOptions opt stats)
+        runReaderT (unApp val) (AppOptions opt stats)
 
 statsTags :: MonadIO m => Options -> m [Tag]
 statsTags opts = liftIO $ do
