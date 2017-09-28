@@ -35,7 +35,6 @@ main = do
 
       void . runApplication envAws envApp $ do
         logInfo "Creating Kafka Consumer"
-
         consumer <- mkConsumer logLevel kafkaConf
         -- producer <- mkProducer kafkaConf -- Use this if you also want a producer.
 
@@ -57,12 +56,12 @@ main = do
 
 withStatsClient :: AppName -> StatsConfig -> (StatsClient -> IO ()) -> IO ()
 withStatsClient appName statsConf f = do
-  globalTags <- mkStatsTags2 statsConf
+  globalTags <- mkStatsTags statsConf
   let statsOpts = DogStatsSettings (statsConf ^. statsHost) (statsConf ^. statsPort)
   bracket (createStatsClient statsOpts (MetricName appName) globalTags) closeStatsClient f
 
-mkStatsTags2 :: StatsConfig -> IO [Tag]
-mkStatsTags2 statsConf = do
+mkStatsTags :: StatsConfig -> IO [Tag]
+mkStatsTags statsConf = do
   deplId <- envTag "TASK_DEPLOY_ID" "deploy_id"
   let envTags = catMaybes [deplId]
   return $ envTags <> (statsConf ^. statsTags <&> toTag)
