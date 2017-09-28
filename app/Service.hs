@@ -4,6 +4,7 @@ module Service
 where
 
 import Control.Arrow          (left)
+import Control.Monad.Catch    (MonadThrow)
 import Control.Monad.IO.Class
 import Data.ByteString        (ByteString)
 import Data.ByteString.Lazy   (fromStrict)
@@ -20,20 +21,12 @@ import App
 -- Emit values downstream because offsets are committed based on their present.
 handleStream :: MonadApp m
              => SchemaRegistry
-             -> Conduit
-                  (Either KafkaError (ConsumerRecord (Maybe ByteString) (Maybe ByteString)))
-                  m
-                  (Either AppError ByteString)
+             -> Sink (ConsumerRecord (Maybe ByteString) (Maybe ByteString)) m ()
 handleStream sr =
-  L.map boxErrors
-  .| L.map (fmap crValue)              -- extracting only value from consumer record
-  .| L.mapMaybe sequenceA              -- discard empty values
-  .| L.mapM (bindM $ decodeMessage sr) -- decode avro message. Uncomment when needed.
-  -- .| L.map (>>= mapAvro)            -- TODO: Implement `mapAvro` if necessary.
+  L.map crValue                 -- extracting only value from consumer record
+  .| L.catMaybes                -- discard empty values
+  .| L.mapM (decodeMessage sr)  -- decode avro message. Uncomment when needed.
+  .| L.sinkNull
 
-decodeMessage :: MonadIO m => SchemaRegistry -> ByteString -> m (Either AppError ByteString)
-decodeMessage sr bs = left DecodeErr <$> decodeWithSchema sr (fromStrict bs)
-
-bindM :: Monad m => (b -> m (Either a c)) -> Either a b -> m (Either a c)
-bindM _ (Left a)  = return $ Left a
-bindM f (Right b) = f b
+decodeMessage :: (MonadIO m, MonadThrow m) => SchemaRegistry -> ByteString -> m ByteString
+decodeMessage sr bs = decodeWithSchema sr (fromStrict bs) >>= throwAs DecodeErr

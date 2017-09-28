@@ -20,14 +20,14 @@ import Data.Text                    (Text)
 import Network.AWS                  as AWS hiding (LogLevel)
 import Network.StatsD               as S
 
-import App.AppOptions
+import App.AppEnv
 import App.AppState
 import App.Options
-import App.Orphans    ()
+import App.Orphans  ()
 
 type AppName = Text
 
-class ( MonadReader AppOptions m
+class ( MonadReader AppEnv m
       , MonadState AppState m
       , MonadLogger m
       , MonadAWS m
@@ -38,7 +38,7 @@ class ( MonadReader AppOptions m
       , MonadIO m) => MonadApp m where
 
 newtype Application a = Application
-  { unApp :: ReaderT AppOptions (StateT AppState (LoggingT AWS)) a
+  { unApp :: ReaderT AppEnv (StateT AppState (LoggingT AWS)) a
   } deriving ( Functor
              , Applicative
              , Monad
@@ -47,7 +47,7 @@ newtype Application a = Application
              , MonadThrow
              , MonadCatch
              , MonadMask
-             , MonadReader AppOptions
+             , MonadReader AppEnv
              , MonadState AppState
              , MonadAWS
              , MonadLogger
@@ -56,7 +56,7 @@ newtype Application a = Application
 deriving instance MonadApp Application
 
 instance MonadStats Application where
-  getStatsClient = reader _appStatsClient
+  getStatsClient = reader _appEnvStatsClient
 
 runApplication :: HasEnv e => AppName -> e -> Options -> TimedFastLogger -> Application () -> IO AppState
 runApplication appName e opt logger val =
@@ -68,17 +68,18 @@ runApplication appName e opt logger val =
         logInfo $ show opt
 
         logInfo "Instantiating StatsD client"
-        globalTags <- statsTags opt
-        let statsOpts = DogStatsSettings (opt ^. optStatsdHost) (opt ^. optStatsdPort)
+        globalTags <- mkStatsTags opt
+        let statsConf = opt ^. optStatsConfig
+        let statsOpts = DogStatsSettings (statsConf ^. statsHost) (statsConf ^. statsPort)
         (_, stats) <- allocate (createStatsClient statsOpts (MetricName appName) globalTags) closeStatsClient
 
-        runReaderT (unApp val) (AppOptions opt stats)
+        runReaderT (unApp val) (AppEnv opt stats)
 
-statsTags :: MonadIO m => Options -> m [Tag]
-statsTags opts = liftIO $ do
+mkStatsTags :: MonadIO m => Options -> m [Tag]
+mkStatsTags opts = liftIO $ do
   deplId <- envTag "TASK_DEPLOY_ID" "deploy_id"
   let envTags = catMaybes [deplId]
-  return $ envTags <> (opts ^. optStatsdTags <&> toTag)
+  return $ envTags <> (opts ^. optStatsConfig . statsTags <&> toTag)
 
 toTag :: StatsTag -> Tag
 toTag (StatsTag (k, v)) = S.tag k v

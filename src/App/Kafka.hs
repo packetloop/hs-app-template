@@ -9,28 +9,29 @@ import Control.Monad.Trans.Resource
 import Data.Foldable
 import Data.List.Split
 import Data.Monoid                  ((<>))
-import Kafka.Conduit
+import Kafka.Conduit.Sink           as KSnk
+import Kafka.Conduit.Source         as KSrc
 
 
-mkConsumer :: MonadResource m => Options -> m KafkaConsumer
-mkConsumer opts =
+mkConsumer :: MonadResource m => LogLevel -> KafkaConfig -> m KafkaConsumer
+mkConsumer logLevel conf =
   let props = fold
-        [ consumerBrokersList [opts ^. optKafkaBroker]
-        , opts ^. optKafkaGroupId                 & groupId
-        , opts ^. optKafkaQueuedMaxMessagesKBytes & consumerQueuedMaxMessagesKBytes
+        [ KSrc.brokersList [conf ^. broker]
+        , conf ^. consumerGroupId    & groupId
+        , conf ^. queuedMaxMsgKBytes & queuedMaxMessagesKBytes
         , noAutoCommit
-        , consumerSuppressDisconnectLogs
-        , consumerLogLevel (kafkaLogLevel (opts ^. optLogLevel))
-        , consumerDebug (kafkaDebugEnable (opts ^. optKafkaDebugEnable))
+        , KSrc.suppressDisconnectLogs
+        , consumerLogLevel (kafkaLogLevel logLevel)
+        , KSrc.debugOptions (kafkaDebugEnable (conf ^. debugOpts))
         ]
-      sub = topics [opts ^. optInputTopic] <> offsetReset Earliest
+      sub = topics [conf ^. inputTopic] <> offsetReset Earliest
       cons = newConsumer props sub >>= either throwM return
    in snd <$> allocate cons (void . closeConsumer)
 
-mkProducer :: MonadResource m => Options -> m KafkaProducer
-mkProducer opts =
-  let props = producerBrokersList [opts ^. optKafkaBroker]
-              <> producerSuppressDisconnectLogs
+mkProducer :: MonadResource m => KafkaConfig -> m KafkaProducer
+mkProducer conf =
+  let props = KSnk.brokersList [conf ^. broker]
+           <> KSnk.suppressDisconnectLogs
       prod = newProducer props >>= either throwM return
    in snd <$> allocate prod closeProducer
 

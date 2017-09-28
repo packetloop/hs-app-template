@@ -60,7 +60,7 @@ library
   exposed-modules:      App
                       , App.Application
                       , App.AppError
-                      , App.AppOptions
+                      , App.AppEnv
                       , App.AppState
                       , App.AWS.Env
                       , App.AWS.S3
