@@ -47,7 +47,7 @@ data Options = Options
 
 makeClassy ''KafkaConfig
 makeClassy ''StatsConfig
-makeLenses ''Options
+makeClassy ''Options
 
 statsConfigParser :: Parser StatsConfig
 statsConfigParser = StatsConfig

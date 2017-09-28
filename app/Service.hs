@@ -3,7 +3,6 @@ module Service
   )
 where
 
-import Control.Arrow          (left)
 import Control.Monad.Catch    (MonadThrow)
 import Control.Monad.IO.Class
 import Data.ByteString        (ByteString)

@@ -2,7 +2,6 @@ module App.AppError
 where
 
 import Control.Monad.Catch
-import Data.Bifunctor      (first)
 import Kafka.Avro
 import Kafka.Types
 

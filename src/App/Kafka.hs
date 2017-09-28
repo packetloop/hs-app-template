@@ -14,14 +14,14 @@ import Kafka.Conduit.Source         as KSrc
 
 
 mkConsumer :: MonadResource m => LogLevel -> KafkaConfig -> m KafkaConsumer
-mkConsumer logLevel conf =
+mkConsumer l conf =
   let props = fold
         [ KSrc.brokersList [conf ^. broker]
         , conf ^. consumerGroupId    & groupId
         , conf ^. queuedMaxMsgKBytes & queuedMaxMessagesKBytes
         , noAutoCommit
         , KSrc.suppressDisconnectLogs
-        , consumerLogLevel (kafkaLogLevel logLevel)
+        , consumerLogLevel (kafkaLogLevel l)
         , KSrc.debugOptions (kafkaDebugEnable (conf ^. debugOpts))
         ]
       sub = topics [conf ^. inputTopic] <> offsetReset Earliest

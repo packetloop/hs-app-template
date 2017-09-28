@@ -4,13 +4,17 @@ import App
 import App.AWS.Env
 import App.Kafka
 import Arbor.Logger
+import Control.Exception
 import Control.Lens
 import Control.Monad                        (void)
 import Data.Conduit
+import Data.Maybe                           (catMaybes)
+import Data.Semigroup                       ((<>))
 import HaskellWorks.Data.Conduit.Combinator
 import Kafka.Avro                           (schemaRegistry)
-import Kafka.Conduit.Sink
+import Kafka.Conduit.Sink                   hiding (logLevel)
 import Kafka.Conduit.Source
+import Network.StatsD                       as S
 import System.Environment
 
 import qualified Data.Text as T
@@ -20,33 +24,48 @@ main :: IO ()
 main = do
   opt <- parseOptions
   progName <- T.pack <$> getProgName
-  let logLevel = opt ^. optLogLevel
+  let logLevel  = opt ^. optLogLevel
+  let kafkaConf = opt ^. optKafkaConfig
+  let statsConf = opt ^. optStatsConfig
 
   withStdOutTimedFastLogger $ \logger -> do
-    env <- mkEnv (opt ^. optRegion) logLevel logger
-    void . runApplication progName env opt logger $ do
-      logInfo "Creating Kafka Consumer"
-      let kafkaConf = opt ^. optKafkaConfig
+    withStatsClient progName statsConf $ \stats -> do
+      envAws <- mkEnv (opt ^. optRegion) logLevel logger
+      let envApp = AppEnv opt stats logger
 
-      consumer <- mkConsumer logLevel kafkaConf
-      -- producer <- mkProducer kafkaConf -- Use this if you also want a producer.
+      void . runApplication envAws envApp $ do
+        logInfo "Creating Kafka Consumer"
 
-      logInfo "Instantiating Schema Registry"
-      sr <- schemaRegistry (kafkaConf ^. schemaRegistryAddress)
+        consumer <- mkConsumer logLevel kafkaConf
+        -- producer <- mkProducer kafkaConf -- Use this if you also want a producer.
 
-      logInfo "Running Kafka Consumer"
-      runConduit $
-        kafkaSourceNoClose consumer (kafkaConf ^. pollTimeoutMs)
-        .| throwLeftSatisfy isFatal                   -- throw any fatal error
-        .| skipNonFatalExcept [isPollTimeout]         -- discard any non-fatal except poll timeouts
-        .| tapRight (Srv.handleStream sr)             -- handle messages (see Service.hs)
-        -- .| batchByOrFlushEither (kafkaConf ^. batchSize) -- Use this if you also want a producer.
-        .| everyNSeconds (kafkaConf ^. commitPeriodSec)  -- only commit ever N seconds, so we don't hammer Kafka.
-        .| commitOffsetsSink consumer
-        -- .| flushThenCommitSink consumer producer -- Swap with the above if you want a producer.
+        logInfo "Instantiating Schema Registry"
+        sr <- schemaRegistry (kafkaConf ^. schemaRegistryAddress)
+
+        logInfo "Running Kafka Consumer"
+        runConduit $
+          kafkaSourceNoClose consumer (kafkaConf ^. pollTimeoutMs)
+          .| throwLeftSatisfy isFatal                   -- throw any fatal error
+          .| skipNonFatalExcept [isPollTimeout]         -- discard any non-fatal except poll timeouts
+          .| tapRight (Srv.handleStream sr)             -- handle messages (see Service.hs)
+          -- .| batchByOrFlushEither (kafkaConf ^. batchSize) -- Use this if you also want a producer.
+          .| everyNSeconds (kafkaConf ^. commitPeriodSec)  -- only commit ever N seconds, so we don't hammer Kafka.
+          .| commitOffsetsSink consumer
+          -- .| flushThenCommitSink consumer producer -- Swap with the above if you want a producer.
 
     pushLogMessage logger LevelError ("Premature exit, must not happen." :: String)
 
--- withStatsClient :: AppName -> Options -> (StatsClient -> IO ()) -> IO ()
--- withStatsClient opt = do
---   globalTags <- statsTags opt
+withStatsClient :: AppName -> StatsConfig -> (StatsClient -> IO ()) -> IO ()
+withStatsClient appName statsConf f = do
+  globalTags <- mkStatsTags2 statsConf
+  let statsOpts = DogStatsSettings (statsConf ^. statsHost) (statsConf ^. statsPort)
+  bracket (createStatsClient statsOpts (MetricName appName) globalTags) closeStatsClient f
+
+mkStatsTags2 :: StatsConfig -> IO [Tag]
+mkStatsTags2 statsConf = do
+  deplId <- envTag "TASK_DEPLOY_ID" "deploy_id"
+  let envTags = catMaybes [deplId]
+  return $ envTags <> (statsConf ^. statsTags <&> toTag)
+  where
+    toTag (StatsTag (k, v)) = S.tag k v
+

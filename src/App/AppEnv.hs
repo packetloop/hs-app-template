@@ -5,20 +5,14 @@ module App.AppEnv
 where
 
 import App.Options
+import Arbor.Logger   (TimedFastLogger)
 import Control.Lens
-import Kafka.Consumer.Types
-import Kafka.Types
-import Network.StatsD       (SampleRate, StatsClient)
-
--- data Stats = Stats
---   { _statsClient     :: StatsClient
---   , _statsSampleRate :: SampleRate
---   }
+import Network.StatsD (StatsClient)
 
 data AppEnv = AppEnv
-  { _appEnvOptions     :: Options
-  , _appEnvStatsClient :: StatsClient
+  { _appOptions     :: Options
+  , _appStatsClient :: StatsClient
+  , _appLogger      :: TimedFastLogger
   }
 
--- makeClassy ''Stats
 makeClassy ''AppEnv
