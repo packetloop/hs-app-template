@@ -20,112 +20,116 @@ import qualified Network.AWS as AWS
 
 newtype StatsTag = StatsTag (Text, Text) deriving (Show, Eq)
 
-data Options = Options
-  { _optLogLevel                     :: LogLevel
-  , _optRegion                       :: Region
-  , _optKafkaBroker                  :: BrokerAddress
-  , _optKafkaSchemaRegistryAddress   :: String
-  , _optKafkaPollTimeoutMs           :: Timeout
-  , _optKafkaQueuedMaxMessagesKBytes :: Int
-  , _optKafkaGroupId                 :: ConsumerGroupId
-  , _optKafkaDebugEnable             :: String
-  , _optKafkaConsumerCommitPeriodSec :: Int
-  , _optInputTopic                   :: TopicName
-  , _optStatsdHost                   :: HostName
-  , _optStatsdPort                   :: Int
-  , _optStatsdTags                   :: [StatsTag]
-  , _optSampleRate                   :: SampleRate
+data KafkaConfig = KafkaConfig
+  { _broker                :: BrokerAddress
+  , _schemaRegistryAddress :: String
+  , _pollTimeoutMs         :: Timeout
+  , _queuedMaxMsgKBytes    :: Int
+  , _consumerGroupId       :: ConsumerGroupId
+  , _debugOpts             :: String
+  , _commitPeriodSec       :: Int
+  , _inputTopic            :: TopicName
   } deriving (Show)
 
-makeLenses ''Options
+data StatsConfig = StatsConfig
+  { _statsHost       :: HostName
+  , _statsPort       :: Int
+  , _statsTags       :: [StatsTag]
+  , _statsSampleRate :: SampleRate
+  } deriving (Show)
 
-options :: Parser Options
-options = Options
+data Options = Options
+  { _optLogLevel    :: LogLevel
+  , _optRegion      :: Region
+  , _optKafkaConfig :: KafkaConfig
+  , _optStatsConfig :: StatsConfig
+  } deriving (Show)
+
+makeClassy ''KafkaConfig
+makeClassy ''StatsConfig
+makeClassy ''Options
+
+statsConfigParser :: Parser StatsConfig
+statsConfigParser = StatsConfig
+  <$> strOption
+    (  long "statsd-host"
+    <> metavar "HOST_NAME"
+    <> showDefault <> value "127.0.0.1"
+    <> help "StatsD host name or IP address")
+  <*> readOption
+    (  long "statsd-port"
+    <> metavar "PORT"
+    <> showDefault <> value 8125
+    <> help "StatsD port"
+    <> hidden)
+  <*> ( string2Tags <$> strOption
+    (  long "statsd-tags"
+    <> metavar "TAGS"
+    <> showDefault <> value []
+    <> help "StatsD tags"))
+  <*> ( SampleRate <$> readOption
+    (  long "statsd-sample-rate"
+    <> metavar "SAMPLE_RATE"
+    <> showDefault <> value 0.01
+    <> help "StatsD sample rate"))
+
+kafkaConfigParser :: Parser KafkaConfig
+kafkaConfigParser = KafkaConfig
+  <$> ( BrokerAddress <$> strOption
+    (  long "kafka-broker"
+    <> metavar "ADDRESS:PORT"
+    <> help "Kafka bootstrap broker"
+    ))
+  <*> strOption
+    (  long "kafka-schema-registry"
+    <> metavar "HTTP_URL:PORT"
+    <> help "Schema registry address")
+  <*> (Timeout <$> readOption
+    (  long "kafka-poll-timeout-ms"
+    <> metavar "KAFKA_POLL_TIMEOUT_MS"
+    <> showDefault <> value 1000
+    <> help "Kafka poll timeout (in milliseconds)"))
+  <*> readOption
+    (  long "kafka-queued-max-messages-kbytes"
+    <> metavar "KAFKA_QUEUED_MAX_MESSAGES_KBYTES"
+    <> showDefault <> value 100000
+    <> help "Kafka queued.max.messages.kbytes")
+  <*> ( ConsumerGroupId <$> strOption
+    (  long "kafka-group-id"
+    <> metavar "GROUP_ID"
+    <> help "Kafka consumer group id"))
+  <*> strOption
+    (  long "kafka-debug-enable"
+    <> metavar "KAFKA_DEBUG_ENABLE"
+    <> showDefault <> value "broker,protocol"
+    <> help "Kafka debug modules, comma separated names: see debug in CONFIGURATION.md"
+    )
+  <*> readOption
+    (  long "kafka-consumer-commit-period-sec"
+    <> metavar "KAFKA_CONSUMER_COMMIT_PERIOD_SEC"
+    <> showDefault <> value 60
+    <> help "Kafka consumer offsets commit period (in seconds)"
+    )
+  <*> ( TopicName <$> strOption
+    (  long "input-topic"
+    <> metavar "TOPIC"
+    <> help "Input topic"))
+
+optParser :: Parser Options
+optParser = Options
   <$> readOptionMsg "Valid values are LevelDebug, LevelInfo, LevelWarn, LevelError"
         (  long "log-level"
-        <> short 'l'
         <> metavar "LOG_LEVEL"
         <> showDefault <> value LevelInfo
         <> help "Log level.")
   <*> readOrFromTextOption
         (  long "region"
-        <> short 'r'
         <> metavar "AWS_REGION"
         <> showDefault <> value Oregon
         <> help "The AWS region in which to operate"
         )
-  <*> ( BrokerAddress <$> strOption
-        (  long "kafka-broker"
-        <> short 'b'
-        <> metavar "ADDRESS:PORT"
-        <> help "Kafka bootstrap broker"
-        ))
-  <*> strOption
-        (  long "kafka-schema-registry"
-        <> short 'r'
-        <> metavar "HTTP_URL:PORT"
-        <> help "Schema registry address")
-  <*> (Timeout <$> readOption
-        (  long "kafka-poll-timeout-ms"
-        <> short 'u'
-        <> metavar "KAFKA_POLL_TIMEOUT_MS"
-        <> showDefault <> value 1000
-        <> help "Kafka poll timeout (in milliseconds)"))
-  <*> readOption
-        (  long "kafka-queued-max-messages-kbytes"
-        <> short 'q'
-        <> metavar "KAFKA_QUEUED_MAX_MESSAGES_KBYTES"
-        <> showDefault <> value 100000
-        <> help "Kafka queued.max.messages.kbytes")
-  <*> ( ConsumerGroupId <$> strOption
-        (  long "kafka-group-id"
-        <> short 'g'
-        <> metavar "GROUP_ID"
-        <> help "Kafka consumer group id"))
-  <*> strOption
-        (  long "kafka-debug-enable"
-        <> short 'd'
-        <> metavar "KAFKA_DEBUG_ENABLE"
-        <> showDefault <> value "broker,protocol"
-        <> help "Kafka debug modules, comma separated names: see debug in CONFIGURATION.md"
-        )
-  <*> readOption
-        (  long "kafka-consumer-commit-period-sec"
-        <> short 'c'
-        <> metavar "KAFKA_CONSUMER_COMMIT_PERIOD_SEC"
-        <> showDefault <> value 60
-        <> help "Kafka consumer offsets commit period (in seconds)"
-        )
-  <*> ( TopicName <$> strOption
-        (  long "input-topic"
-        <> short 'i'
-        <> metavar "TOPIC"
-        <> help "Input topic"))
-  <*> strOption
-        (  long "statsd-host"
-        <> short 's'
-        <> metavar "HOST_NAME"
-        <> showDefault <> value "127.0.0.1"
-        <> help "StatsD host name or IP address")
-  <*> readOption
-        (  long "statsd-port"
-        <> short 'p'
-        <> metavar "PORT"
-        <> showDefault <> value 8125
-        <> help "StatsD port"
-        <> hidden)
-  <*> ( string2Tags <$> strOption
-        (  long "statsd-tags"
-        <> short 't'
-        <> metavar "TAGS"
-        <> showDefault <> value []
-        <> help "StatsD tags"))
-  <*> ( SampleRate <$> readOption
-        (  long "statsd-sample-rate"
-        <> short 'a'
-        <> metavar "SAMPLE_RATE"
-        <> showDefault <> value 0.01
-        <> help "StatsD sample rate"))
+  <*> kafkaConfigParser
+  <*> statsConfigParser
 
 awsLogLevel :: Options -> AWS.LogLevel
 awsLogLevel o = case o ^. optLogLevel of
@@ -152,12 +156,12 @@ string2Tags s = StatsTag . splitTag <$> splitTags
     splitTags = T.split (==',') (T.pack s)
     splitTag t = T.drop 1 <$> T.break (==':') t
 
-optionsParser :: ParserInfo Options
-optionsParser = info (helper <*> options)
+optParserInfo :: ParserInfo Options
+optParserInfo = info (helper <*> optParser)
   (  fullDesc
   <> progDesc "For each attack caclulates its spuriousity index [0..1]"
   <> header "Spurious Attacks Detector"
   )
 
 parseOptions :: IO Options
-parseOptions = execParser optionsParser
+parseOptions = execParser optParserInfo

@@ -18,4 +18,4 @@ ${path}/bin/${exe} \
   --input-topic ${CLUB_NAME}--hs-app-template-input \
   --kafka-poll-timeout-ms 10000 \
   --kafka-debug-enable "broker,protocol" \
-  --log-level LevelDebug
+  --log-level LevelInfo
