@@ -49,6 +49,12 @@ makeClassy ''KafkaConfig
 makeClassy ''StatsConfig
 makeClassy ''Options
 
+instance HasKafkaConfig Options where
+  kafkaConfig = optKafkaConfig
+
+instance HasStatsConfig Options where
+  statsConfig = optStatsConfig
+
 statsConfigParser :: Parser StatsConfig
 statsConfigParser = StatsConfig
   <$> strOption
