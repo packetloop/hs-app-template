@@ -28,15 +28,15 @@ main = do
   let kafkaConf = opt ^. optKafkaConfig
   let statsConf = opt ^. optStatsConfig
 
-  withStdOutTimedFastLogger $ \logger -> do
+  withStdOutTimedFastLogger $ \lgr -> do
     withStatsClient progName statsConf $ \stats -> do
-      envAws <- mkEnv (opt ^. optRegion) logLevel logger
-      let envApp = AppEnv opt stats logger
+      envAws <- mkEnv (opt ^. optRegion) logLevel lgr
+      let envApp = AppEnv opt stats lgr
 
       void . runApplication envAws envApp $ do
         logInfo "Creating Kafka Consumer"
-        consumer <- mkConsumer logLevel kafkaConf
-        -- producer <- mkProducer kafkaConf -- Use this if you also want a producer.
+        consumer <- mkConsumer logLevel lgr kafkaConf
+        -- producer <- mkProducer logLevel lgr kafkaConf -- Use this if you also want a producer.
 
         logInfo "Instantiating Schema Registry"
         sr <- schemaRegistry (kafkaConf ^. schemaRegistryAddress)
@@ -52,7 +52,7 @@ main = do
           .| commitOffsetsSink consumer
           -- .| flushThenCommitSink consumer producer -- Swap with the above if you want a producer.
 
-    pushLogMessage logger LevelError ("Premature exit, must not happen." :: String)
+    pushLogMessage lgr LevelError ("Premature exit, must not happen." :: String)
 
 withStatsClient :: AppName -> StatsConfig -> (StatsClient -> IO ()) -> IO ()
 withStatsClient appName statsConf f = do
