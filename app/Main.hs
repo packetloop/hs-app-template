@@ -31,12 +31,12 @@ main = do
   withStdOutTimedFastLogger $ \lgr -> do
     withStatsClient progName statsConf $ \stats -> do
       envAws <- mkEnv (opt ^. optRegion) logLevel lgr
-      let envApp = AppEnv opt stats lgr
+      let envApp = AppEnv opt stats (Logger lgr logLevel)
 
       void . runApplication envAws envApp $ do
         logInfo "Creating Kafka Consumer"
-        consumer <- mkConsumer logLevel lgr kafkaConf
-        -- producer <- mkProducer logLevel lgr kafkaConf -- Use this if you also want a producer.
+        consumer <- mkConsumer Nothing (opt ^. optInputTopic)
+        -- producer <- mkProducer -- Use this if you also want a producer.
 
         logInfo "Instantiating Schema Registry"
         sr <- schemaRegistry (kafkaConf ^. schemaRegistryAddress)

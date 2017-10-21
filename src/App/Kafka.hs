@@ -1,12 +1,19 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module App.Kafka
+( ConsumerGroupSuffix(..), TopicName(..)
+, KafkaConsumer, KafkaProducer, Timeout(..)
+, mkConsumer
+, mkProducer
+)
 where
 
+import App.AppEnv
 import App.Options
 import Arbor.Logger
 import Control.Lens                 hiding (cons)
 import Control.Monad                (void)
 import Control.Monad.Logger         (LogLevel (..))
+import Control.Monad.Reader
 import Control.Monad.Trans.Resource
 import Data.Foldable
 import Data.List.Split
@@ -14,36 +21,45 @@ import Data.Monoid                  ((<>))
 import Kafka.Conduit.Sink           as KSnk
 import Kafka.Conduit.Source         as KSrc
 
+newtype ConsumerGroupSuffix = ConsumerGroupSuffix String deriving (Show, Eq)
 
--- Can be this:
--- mkConsumer :: (MonadResource m, MonadReader r m, HasKafkaConfig r, HasLogger r) => LogLevel -> m KafkaConsumer
--- I can't decide which one is better so I leave this comment
-mkConsumer :: MonadResource m => LogLevel -> TimedFastLogger -> KafkaConfig -> m KafkaConsumer
-mkConsumer lvl lgr conf =
+mkConsumer :: (MonadResource m, MonadReader r m, HasKafkaConfig r, HasLogger r)
+            => Maybe ConsumerGroupSuffix
+            -> TopicName
+            -> m KafkaConsumer
+mkConsumer suffix topic = do
+  conf <- view kafkaConfig
+  logs <- view logger
   let props = fold
         [ KSrc.brokersList [conf ^. broker]
-        , conf ^. consumerGroupId    & groupId
+        , conf ^. consumerGroupId    & adjustGroupId suffix & groupId
         , conf ^. queuedMaxMsgKBytes & queuedMaxMessagesKBytes
         , noAutoCommit
         , KSrc.suppressDisconnectLogs
-        , consumerLogLevel (kafkaLogLevel lvl)
+        , KSrc.logLevel (kafkaLogLevel (logs ^. lgLogLevel))
         , KSrc.debugOptions (kafkaDebugEnable (conf ^. debugOpts))
-        , KSrc.setCallback (logCallback   (\l s1 s2 -> pushLogMessage lgr (kafkaLogLevelToLogLevel $ toEnum l) ("[" <> s1 <> "] " <> s2)))
-        , KSrc.setCallback (errorCallback (\e s -> pushLogMessage lgr LevelError ("[" <> show e <> "] " <> s)))
+        , KSrc.setCallback (logCallback   (\l s1 s2 -> pushLogMessage (logs ^. lgLogger) (kafkaLogLevelToLogLevel $ toEnum l) ("[" <> s1 <> "] " <> s2)))
+        , KSrc.setCallback (errorCallback (\e s -> pushLogMessage (logs ^. lgLogger) LevelError ("[" <> show e <> "] " <> s)))
         ]
-      sub = topics [conf ^. inputTopic] <> offsetReset Earliest
+      sub = topics [topic] <> offsetReset Earliest
       cons = newConsumer props sub >>= either throwM return
-   in snd <$> allocate cons (void . closeConsumer)
+  snd <$> allocate cons (void . closeConsumer)
 
-mkProducer :: MonadResource m => LogLevel -> TimedFastLogger -> KafkaConfig -> m KafkaProducer
-mkProducer lvl lgr conf =
+mkProducer :: (MonadResource m, MonadReader r m, HasKafkaConfig r, HasLogger r) => m KafkaProducer
+mkProducer = do
+  conf <- view kafkaConfig
+  logs <- view logger
   let props = KSnk.brokersList [conf ^. broker]
            <> KSnk.suppressDisconnectLogs
-           <> logLevel (kafkaLogLevel lvl)
-           <> KSnk.setCallback (logCallback   (\l s1 s2 -> pushLogMessage lgr (kafkaLogLevelToLogLevel $ toEnum l) ("[" <> s1 <> "] " <> s2)))
-           <> KSnk.setCallback (errorCallback (\e s -> pushLogMessage lgr LevelError ("[" <> show e <> "] " <> s)))
+           <> KSnk.logLevel (kafkaLogLevel (logs ^. lgLogLevel))
+           <> KSnk.setCallback (logCallback   (\l s1 s2 -> pushLogMessage (logs ^. lgLogger) (kafkaLogLevelToLogLevel $ toEnum l) ("[" <> s1 <> "] " <> s2)))
+           <> KSnk.setCallback (errorCallback (\e s -> pushLogMessage (logs ^. lgLogger) LevelError ("[" <> show e <> "] " <> s)))
       prod = newProducer props >>= either throwM return
-   in snd <$> allocate prod closeProducer
+  snd <$> allocate prod closeProducer
+
+adjustGroupId :: Maybe ConsumerGroupSuffix -> ConsumerGroupId -> ConsumerGroupId
+adjustGroupId (Just (ConsumerGroupSuffix suffix)) (ConsumerGroupId txt) = ConsumerGroupId (txt <> "-" <> suffix)
+adjustGroupId _ cgid                                                    = cgid
 
 kafkaLogLevel :: LogLevel -> KafkaLogLevel
 kafkaLogLevel l = case l of

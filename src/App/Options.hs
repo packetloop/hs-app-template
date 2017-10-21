@@ -28,7 +28,6 @@ data KafkaConfig = KafkaConfig
   , _consumerGroupId       :: ConsumerGroupId
   , _debugOpts             :: String
   , _commitPeriodSec       :: Int
-  , _inputTopic            :: TopicName
   } deriving (Show)
 
 data StatsConfig = StatsConfig
@@ -41,6 +40,7 @@ data StatsConfig = StatsConfig
 data Options = Options
   { _optLogLevel    :: LogLevel
   , _optRegion      :: Region
+  , _optInputTopic  :: TopicName
   , _optKafkaConfig :: KafkaConfig
   , _optStatsConfig :: StatsConfig
   } deriving (Show)
@@ -116,10 +116,6 @@ kafkaConfigParser = KafkaConfig
     <> showDefault <> value 60
     <> help "Kafka consumer offsets commit period (in seconds)"
     )
-  <*> ( TopicName <$> strOption
-    (  long "input-topic"
-    <> metavar "TOPIC"
-    <> help "Input topic"))
 
 optParser :: Parser Options
 optParser = Options
@@ -134,6 +130,10 @@ optParser = Options
         <> showDefault <> value Oregon
         <> help "The AWS region in which to operate"
         )
+  <*> ( TopicName <$> strOption
+        (  long "input-topic"
+        <> metavar "TOPIC"
+        <> help "Input topic"))
   <*> kafkaConfigParser
   <*> statsConfigParser
 
