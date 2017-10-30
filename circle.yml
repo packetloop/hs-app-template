@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/hs-app-template
     docker:
-      - image: fpco/stack-build:latest
+      - image: quay.io/haskell_works/stack-build-python
 
     environment:
       LD_LIBRARY_PATH: /usr/local/lib
