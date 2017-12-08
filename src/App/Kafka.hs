@@ -51,6 +51,7 @@ mkProducer = do
   logs <- view logger
   let props = KSnk.brokersList [conf ^. broker]
            <> KSnk.suppressDisconnectLogs
+           <> KSnk.sendTimeout (Timeout 0) -- message sending timeout, 0 means "no timeout"
            <> KSnk.logLevel (kafkaLogLevel (logs ^. lgLogLevel))
            <> KSnk.setCallback (logCallback   (\l s1 s2 -> pushLogMessage (logs ^. lgLogger) (kafkaLogLevelToLogLevel $ toEnum l) ("[" <> s1 <> "] " <> s2)))
            <> KSnk.setCallback (errorCallback (\e s -> pushLogMessage (logs ^. lgLogger) LevelError ("[" <> show e <> "] " <> s)))
