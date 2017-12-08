@@ -1,15 +1,15 @@
-FROM fpco/ubuntu-with-libgmp:14.04
-MAINTAINER Tyler Durden <mayhem@arbor.net>
+FROM ubuntu:16.04
+LABEL maintainer="Tyler Durden <mayhem@arbor.net>"
 
 ADD docker/set-environment.sh /usr/local/bin/set-environment
 
-RUN apt-get install -y jq && \
+RUN apt-get update && \
+    apt-get install -y jq libgmp10 libssl1.0.0 iproute netbase ca-certificates && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY .librdkafka/ /usr/local/
+COPY .librdkafka/ /usr/
 
 ENV LOG_LEVEL LevelInfo
-ENV LD_LIBRARY_PATH /usr/local/lib
 
 ADD docker/start.sh /start.sh
 ADD docker/test.sh /test.sh

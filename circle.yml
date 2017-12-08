@@ -5,9 +5,6 @@ jobs:
     docker:
       - image: quay.io/haskell_works/stack-build-python
 
-    environment:
-      LD_LIBRARY_PATH: /usr/local/lib
-
     steps:
       - checkout
       - run: git fetch --unshallow || true
