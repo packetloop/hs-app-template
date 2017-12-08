@@ -65,8 +65,17 @@ case $1 in
   ;;
 
   build)
-    docker build -t ${BUILD_TAG} .
-    docker tag ${BUILD_TAG} ${IMAGE_NAME}:latest
+    docker build --tag ${BUILD_TAG} --tag ${IMAGE_NAME}:latest \
+                 --label appName="${BUILD_NAME}" \
+                 --label appVersion="${BUILD_VERSION}" \
+                 --label buildUser="${BUILD_USER}" \
+                 --label buildNum="${BUILD_NUM}" \
+                 --label gitRepo="${BUILD_REPO_NAME}" \
+                 --label gitSha1="${GIT_SHA1}" \
+                 --label gitHash="${GIT_HASH}" \
+                 --label gitBranch="${BRANCH_NAME}" \
+                 --label buildUncommitted=$GIT_UNCLEAN \
+                 .
   ;;
 
   run)
