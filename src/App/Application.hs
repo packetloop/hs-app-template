@@ -20,7 +20,6 @@ import Network.StatsD               as S
 
 import App.AppEnv
 import App.AppState
-import App.Options
 import App.Orphans  ()
 
 type AppName = Text

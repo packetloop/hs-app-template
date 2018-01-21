@@ -21,18 +21,20 @@ import Data.Monoid                  ((<>))
 import Kafka.Conduit.Sink           as KSnk
 import Kafka.Conduit.Source         as KSrc
 
+import qualified Data.Map as M
+
 newtype ConsumerGroupSuffix = ConsumerGroupSuffix String deriving (Show, Eq)
 
 mkConsumer :: (MonadResource m, MonadReader r m, HasKafkaConfig r, HasLogger r)
-            => Maybe ConsumerGroupSuffix
+            => ConsumerGroupId
             -> TopicName
             -> m KafkaConsumer
-mkConsumer suffix topic = do
+mkConsumer cgid topic = do
   conf <- view kafkaConfig
   logs <- view logger
   let props = fold
         [ KSrc.brokersList [conf ^. broker]
-        , conf ^. consumerGroupId    & adjustGroupId suffix & groupId
+        , cgid & groupId
         , conf ^. queuedMaxMsgKBytes & queuedMaxMessagesKBytes
         , noAutoCommit
         , KSrc.suppressDisconnectLogs
@@ -55,12 +57,18 @@ mkProducer = do
            <> KSnk.logLevel (kafkaLogLevel (logs ^. lgLogLevel))
            <> KSnk.setCallback (logCallback   (\l s1 s2 -> pushLogMessage (logs ^. lgLogger) (kafkaLogLevelToLogLevel $ toEnum l) ("[" <> s1 <> "] " <> s2)))
            <> KSnk.setCallback (errorCallback (\e s -> pushLogMessage (logs ^. lgLogger) LevelError ("[" <> show e <> "] " <> s)))
+           <> KSnk.setCallback (deliveryErrorsCallback (logAndDieHard (logs ^. lgLogger)))
+           <> KSnk.extraProps (M.singleton "linger.ms"                 "100")
+           <> KSnk.extraProps (M.singleton "message.send.max.retries"  "0"  )
+           <> KSnk.compression Gzip
       prod = newProducer props >>= either throwM return
   snd <$> allocate prod closeProducer
 
-adjustGroupId :: Maybe ConsumerGroupSuffix -> ConsumerGroupId -> ConsumerGroupId
-adjustGroupId (Just (ConsumerGroupSuffix suffix)) (ConsumerGroupId txt) = ConsumerGroupId (txt <> "-" <> suffix)
-adjustGroupId _ cgid                                                    = cgid
+logAndDieHard :: TimedFastLogger -> KafkaError -> IO ()
+logAndDieHard lgr err = do
+  let errMsg = "Producer is unable to deliver messages: " <> show err
+  pushLogMessage lgr LevelError errMsg
+  error errMsg
 
 kafkaLogLevel :: LogLevel -> KafkaLogLevel
 kafkaLogLevel l = case l of

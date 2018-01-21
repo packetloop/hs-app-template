@@ -35,7 +35,7 @@ main = do
 
       void . runApplication envAws envApp $ do
         logInfo "Creating Kafka Consumer"
-        consumer <- mkConsumer Nothing (opt ^. optInputTopic)
+        consumer <- mkConsumer (opt ^. consumerGroupId) (opt ^. optInputTopic)
         -- producer <- mkProducer -- Use this if you also want a producer.
 
         logInfo "Instantiating Schema Registry"
