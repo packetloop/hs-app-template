@@ -24,14 +24,14 @@ main :: IO ()
 main = do
   opt <- parseOptions
   progName <- T.pack <$> getProgName
-  let logLevel  = opt ^. optLogLevel
+  let logLvk  = opt ^. optLogLevel
   let kafkaConf = opt ^. optKafkaConfig
   let statsConf = opt ^. optStatsConfig
 
   withStdOutTimedFastLogger $ \lgr -> do
     withStatsClient progName statsConf $ \stats -> do
-      envAws <- mkEnv (opt ^. optRegion) logLevel lgr
-      let envApp = AppEnv opt stats (Logger lgr logLevel)
+      envAws <- mkEnv (opt ^. optRegion) logLvk lgr
+      let envApp = AppEnv opt stats (Logger lgr logLvk)
 
       void . runApplication envAws envApp $ do
         logInfo "Creating Kafka Consumer"
@@ -46,8 +46,7 @@ main = do
           kafkaSourceNoClose consumer (kafkaConf ^. pollTimeoutMs)
           .| throwLeftSatisfy isFatal                   -- throw any fatal error
           .| skipNonFatalExcept [isPollTimeout]         -- discard any non-fatal except poll timeouts
-          .| tapRight (Srv.handleStream sr)             -- handle messages (see Service.hs)
-          -- .| batchByOrFlushEither (kafkaConf ^. batchSize) -- Use this if you also want a producer.
+          .| rightC (Srv.handleStream sr)             -- handle messages (see Service.hs)
           .| everyNSeconds (kafkaConf ^. commitPeriodSec)  -- only commit ever N seconds, so we don't hammer Kafka.
           .| commitOffsetsSink consumer
           -- .| flushThenCommitSink consumer producer -- Swap with the above if you want a producer.

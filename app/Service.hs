@@ -3,12 +3,11 @@ module Service
   )
 where
 
-import Control.Monad.Catch    (MonadThrow)
-import Control.Monad.IO.Class
-import Data.ByteString        (ByteString)
-import Data.ByteString.Lazy   (fromStrict)
-import Data.Conduit
-import Kafka.Avro             (SchemaRegistry, decodeWithSchema)
+import Conduit
+import Control.Monad.Catch  (MonadThrow)
+import Data.ByteString      (ByteString)
+import Data.ByteString.Lazy (fromStrict)
+import Kafka.Avro           (SchemaRegistry, decodeWithSchema)
 import Kafka.Conduit.Source
 
 import qualified Data.Conduit.List as L
@@ -20,12 +19,12 @@ import App
 -- Emit values downstream because offsets are committed based on their present.
 handleStream :: MonadApp m
              => SchemaRegistry
-             -> Sink (ConsumerRecord (Maybe ByteString) (Maybe ByteString)) m ()
+             -> Conduit (ConsumerRecord (Maybe ByteString) (Maybe ByteString)) m ()
 handleStream sr =
-  L.map crValue                 -- extracting only value from consumer record
+  mapC crValue                 -- extracting only value from consumer record
   .| L.catMaybes                -- discard empty values
-  .| L.mapM (decodeMessage sr)  -- decode avro message. Uncomment when needed.
-  .| L.sinkNull
+  .| mapMC (decodeMessage sr)  -- decode avro message. Uncomment when needed.
+  .| mapC (const ())
 
 decodeMessage :: (MonadIO m, MonadThrow m) => SchemaRegistry -> ByteString -> m ByteString
 decodeMessage sr bs = decodeWithSchema sr (fromStrict bs) >>= throwAs DecodeErr

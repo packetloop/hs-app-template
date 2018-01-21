@@ -28,6 +28,7 @@ executable hs-app-template
                       , bifunctors
                       , bytestring
                       , conduit
+                      , conduit-combinators
                       , containers
                       , datadog
                       , directory
@@ -78,6 +79,7 @@ library
                       , bytestring
                       , conduit
                       , conduit-extra
+                      , conduit-combinators
                       , containers
                       , datadog
                       , directory
@@ -123,6 +125,7 @@ test-suite tests
                       , bifunctors
                       , bytestring
                       , conduit
+                      , conduit-combinators
                       , containers
                       , datadog
                       , directory
