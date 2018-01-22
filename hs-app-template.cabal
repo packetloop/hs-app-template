@@ -28,6 +28,7 @@ executable hs-app-template
                       , bifunctors
                       , bytestring
                       , conduit
+                      , conduit-combinators
                       , containers
                       , datadog
                       , directory
@@ -50,8 +51,11 @@ executable hs-app-template
                       , text
                       , transformers
                       , transformers-base
-  ghc-options:       -threaded -rtsopts -O2
-  default-extensions: OverloadedStrings, TupleSections
+  ghc-options:        -threaded -rtsopts -O2
+  default-extensions: OverloadedStrings
+                      TupleSections
+                      MultiParamTypeClasses
+                      LambdaCase
   if os(darwin)
     cpp-options: -D__attribute__(A)= -D_Nullable= -D_Nonnull=
 
@@ -78,6 +82,7 @@ library
                       , bytestring
                       , conduit
                       , conduit-extra
+                      , conduit-combinators
                       , containers
                       , datadog
                       , directory
@@ -101,7 +106,10 @@ library
                       , text
                       , transformers
                       , transformers-base
-  default-extensions: OverloadedStrings, TupleSections
+  default-extensions: OverloadedStrings
+                      TupleSections
+                      MultiParamTypeClasses
+                      LambdaCase
   if os(darwin)
     cpp-options: -D__attribute__(A)= -D_Nullable= -D_Nonnull=
 
@@ -123,6 +131,7 @@ test-suite tests
                       , bifunctors
                       , bytestring
                       , conduit
+                      , conduit-combinators
                       , containers
                       , datadog
                       , directory
@@ -143,6 +152,8 @@ test-suite tests
                       , text
                       , transformers
                       , transformers-base
-  default-extensions: OverloadedStrings, TupleSections
+  default-extensions: OverloadedStrings
+                      TupleSections
+                      MultiParamTypeClasses
   if os(darwin)
     cpp-options: -D__attribute__(A)= -D_Nullable= -D_Nonnull=

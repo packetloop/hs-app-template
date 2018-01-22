@@ -25,7 +25,6 @@ data KafkaConfig = KafkaConfig
   , _schemaRegistryAddress :: String
   , _pollTimeoutMs         :: Timeout
   , _queuedMaxMsgKBytes    :: Int
-  , _consumerGroupId       :: ConsumerGroupId
   , _debugOpts             :: String
   , _commitPeriodSec       :: Int
   } deriving (Show)
@@ -38,11 +37,12 @@ data StatsConfig = StatsConfig
   } deriving (Show)
 
 data Options = Options
-  { _optLogLevel    :: LogLevel
-  , _optRegion      :: Region
-  , _optInputTopic  :: TopicName
-  , _optKafkaConfig :: KafkaConfig
-  , _optStatsConfig :: StatsConfig
+  { _optLogLevel     :: LogLevel
+  , _optRegion       :: Region
+  , _optInputTopic   :: TopicName
+  , _consumerGroupId :: ConsumerGroupId
+  , _optKafkaConfig  :: KafkaConfig
+  , _optStatsConfig  :: StatsConfig
   } deriving (Show)
 
 makeClassy ''KafkaConfig
@@ -100,10 +100,6 @@ kafkaConfigParser = KafkaConfig
     <> metavar "KAFKA_QUEUED_MAX_MESSAGES_KBYTES"
     <> showDefault <> value 100000
     <> help "Kafka queued.max.messages.kbytes")
-  <*> ( ConsumerGroupId <$> strOption
-    (  long "kafka-group-id"
-    <> metavar "GROUP_ID"
-    <> help "Kafka consumer group id"))
   <*> strOption
     (  long "kafka-debug-enable"
     <> metavar "KAFKA_DEBUG_ENABLE"
@@ -134,6 +130,10 @@ optParser = Options
         (  long "input-topic"
         <> metavar "TOPIC"
         <> help "Input topic"))
+  <*> ( ConsumerGroupId <$> strOption
+    (  long "kafka-group-id"
+    <> metavar "GROUP_ID"
+    <> help "Kafka consumer group id"))
   <*> kafkaConfigParser
   <*> statsConfigParser
 
