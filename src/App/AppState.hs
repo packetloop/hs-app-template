@@ -1,7 +1,7 @@
 module App.AppState
 where
 
-data AppState = AppState {}
+data AppState = AppState {} deriving Show
 
 appStateEmpty :: AppState
 appStateEmpty = AppState {}

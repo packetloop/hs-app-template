@@ -4,7 +4,6 @@ module Service
 where
 
 import Conduit
-import Control.Monad.Catch  (MonadThrow)
 import Data.ByteString      (ByteString)
 import Data.ByteString.Lazy (fromStrict)
 import Kafka.Avro           (SchemaRegistry, decodeWithSchema)
@@ -26,5 +25,5 @@ handleStream sr =
   .| mapMC (decodeMessage sr)  -- decode avro message. Uncomment when needed.
   .| mapC (const ())
 
-decodeMessage :: (MonadIO m, MonadThrow m) => SchemaRegistry -> ByteString -> m ByteString
-decodeMessage sr bs = decodeWithSchema sr (fromStrict bs) >>= throwAs DecodeErr
+decodeMessage :: (MonadIO m, MonadAppError m) => SchemaRegistry -> ByteString -> m ByteString
+decodeMessage sr bs = decodeWithSchema sr (fromStrict bs) >>= throwErrorAs DecodeErr

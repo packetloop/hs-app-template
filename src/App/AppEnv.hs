@@ -7,6 +7,7 @@ where
 import App.Options
 import Arbor.Logger   (LogLevel, TimedFastLogger)
 import Control.Lens
+import Network.AWS    (Env, HasEnv (..))
 import Network.StatsD (StatsClient)
 
 data Logger = Logger
@@ -16,12 +17,16 @@ data Logger = Logger
 
 data AppEnv = AppEnv
   { _appOptions     :: Options
+  , _appAwsEnv      :: Env
   , _appStatsClient :: StatsClient
   , _appLogger      :: Logger
   }
 
 makeClassy ''Logger
 makeClassy ''AppEnv
+
+instance HasEnv AppEnv where
+  environment = appEnv . appAwsEnv
 
 class HasStatsClient a where
   statsClient :: Lens' a StatsClient
@@ -40,3 +45,4 @@ instance HasKafkaConfig AppEnv where
 
 instance HasStatsConfig AppEnv where
   statsConfig = appOptions . statsConfig
+

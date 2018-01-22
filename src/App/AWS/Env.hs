@@ -1,5 +1,6 @@
 module App.AWS.Env
 ( mkEnv
+, AWS.HasEnv
 )
 where
 
