@@ -165,8 +165,8 @@ string2Tags s = StatsTag . splitTag <$> splitTags
 optParserInfo :: ParserInfo Options
 optParserInfo = info (helper <*> optParser)
   (  fullDesc
-  <> progDesc "For each attack caclulates its spuriousity index [0..1]"
-  <> header "Spurious Attacks Detector"
+  <> progDesc "Template for Haskell projects with built-in support for Kafka and AWS"
+  <> header "Haskell App Template"
   )
 
 parseOptions :: IO Options
