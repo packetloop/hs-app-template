@@ -5,7 +5,7 @@ set -e
 export CLUB_NAME=${CLUB_NAME:-$USER}
 export KAFKA_HOST=${KAFKA_HOST:-localhost}
 
-exe=$(cat $(basename $PWD).cabal | grep executable | head -n 1 | cut -d' ' -f2)
+exe=$(cat package.yaml | grep -A 1 executables: | tail -n 1 | cut -d : -f 1 | xargs)
 echo "Running: $exe"
 
 stack build
