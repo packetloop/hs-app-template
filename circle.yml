@@ -1,7 +1,7 @@
 version: 2.0
 jobs:
   build:
-    working_directory: ~/hs-app-template
+    working_directory: ~/project
     docker:
       - image: quay.io/haskell_works/stack-build-python
 
@@ -17,11 +17,11 @@ jobs:
           command: ./scripts/build-librdkafka.sh
       - save_cache:
           key: librdkafka-{{ checksum "scripts/build-librdkafka.sh" }}
-          paths: ~/hs-app-template/.librdkafka
+          paths: ~/project/.librdkafka
 
       - restore_cache:
           keys:
-            - dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
+            - dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "package.yaml" }}
             - dot-stack-{{ checksum "stack.yaml" }}
             - dot-stack-{{ checksum "resolver.txt" }}
             - dot-stack-resolver-{{ checksum "resolver.txt" }}
@@ -45,12 +45,12 @@ jobs:
 
       - run: stack build --test --no-run-tests
       - save_cache:
-          key: dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "hs-app-template.cabal" }}
+          key: dot-stack-{{ checksum "stack.yaml" }}-{{ checksum "package.yaml" }}
           paths:
             - ~/.stack
       - save_cache:
           key: stack-work-{{ checksum "stack.yaml" }}
-          paths: ~/hs-app-template/.stack-work
+          paths: ~/project/.stack-work
 
       - setup_remote_docker
       - run:
