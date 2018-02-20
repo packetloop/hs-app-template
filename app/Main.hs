@@ -6,13 +6,12 @@ import App.Kafka
 import Arbor.Logger
 import Control.Exception
 import Control.Lens
-import Control.Monad                        (void)
 import Data.Conduit
 import Data.Maybe                           (catMaybes)
 import Data.Semigroup                       ((<>))
 import HaskellWorks.Data.Conduit.Combinator
 import Kafka.Avro                           (schemaRegistry)
-import Kafka.Conduit.Sink                   hiding (logLevel)
+import Kafka.Conduit.Sink
 import Kafka.Conduit.Source
 import Network.StatsD                       as S
 import System.Environment

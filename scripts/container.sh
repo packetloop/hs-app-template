@@ -44,8 +44,6 @@ case $1 in
           --docker-image=$_image build \
           --extra-include-dirs "/usr/include/librdkafka" \
           --extra-lib-dirs "/usr/lib/librdkafka" \
-          --extra-lib-dirs "$PWD/.librdkafka/lib" \
-
 
     echo "Building the container"
     docker build --tag ${BUILD_TAG} --tag ${IMAGE_NAME}:latest \
