@@ -49,15 +49,16 @@ library:
   ghc-options: -Wall
   exposed-modules:
   - App
-  - App.Application
-  - App.AppError
-  - App.AppEnv
-  - App.AppState
   - App.AWS.Env
   - App.AWS.S3
+  - App.AppEnv
+  - App.AppError
+  - App.AppState
+  - App.Application
   - App.Kafka
   - App.Options
   - App.Orphans
+  - App.Service
   dependencies:
   - conduit-extra
   - http-types

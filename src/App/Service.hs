@@ -1,8 +1,8 @@
-module Service
+module App.Service
   ( handleStream
-  )
-where
+  ) where
 
+import App
 import Conduit
 import Data.ByteString      (ByteString)
 import Data.ByteString.Lazy (fromStrict)
@@ -10,8 +10,6 @@ import Kafka.Avro           (SchemaRegistry, decodeWithSchema)
 import Kafka.Conduit.Source
 
 import qualified Data.Conduit.List as L
-
-import App
 
 -- | Handles the stream of incoming messages.
 -- Change the return type to anything.
