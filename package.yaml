@@ -19,7 +19,6 @@ default-extensions:
 - EmptyCase
 - FlexibleContexts
 - FlexibleInstances
-- FunctionalDependencies
 - GeneralizedNewtypeDeriving
 - InstanceSigs
 - LambdaCase
