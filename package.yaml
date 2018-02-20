@@ -10,7 +10,6 @@ extra-source-files:
 - README.md
 default-extensions:
 - BangPatterns
-- DataKinds
 - DefaultSignatures
 - DeriveFoldable
 - DeriveFunctor
@@ -21,7 +20,6 @@ default-extensions:
 - FlexibleContexts
 - FlexibleInstances
 - FunctionalDependencies
-- GADTs
 - GeneralizedNewtypeDeriving
 - InstanceSigs
 - LambdaCase
