@@ -17,8 +17,8 @@ import Kafka.Conduit.Source
 import Network.StatsD                       as S
 import System.Environment
 
-import qualified Data.Text as T
-import qualified Service   as Srv
+import qualified App.Service as Srv
+import qualified Data.Text   as T
 
 main :: IO ()
 main = do
