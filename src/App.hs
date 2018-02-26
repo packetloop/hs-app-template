@@ -1,7 +1,6 @@
 module App
-( module X
-)
-where
+  ( module X
+  ) where
 
 import App.AppEnv      as X
 import App.AppError    as X

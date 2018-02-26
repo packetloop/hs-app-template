@@ -1,8 +1,8 @@
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
-module DevApp
-where
+
+module DevApp where
 
 import Arbor.Logger
 import Control.Monad.Base
@@ -26,7 +26,6 @@ instance MonadStats DevApp where
 
 runDevApp' :: HasEnv e => e -> TimedFastLogger -> DevApp a -> IO a
 runDevApp' e logger f = runResourceT . runAWS e $ runTimedLogT LevelInfo logger (unDevApp f)
-
 
 runDevApp :: DevApp a -> IO a
 runDevApp f =
