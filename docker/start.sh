@@ -2,12 +2,12 @@
 
 echo "Starting service"
 
+# This runs the set environment script. The `.` is important - it makes the
+# exports visible in *this* context, not just within the script.
 . set-environment
 
 export GATEWAY_IP=$(ip route | grep default | cut -d ' ' -f 3)
 export STATSD_HOST=${STATSD_HOST:-$GATEWAY_IP}
-
-/usr/local/bin/set-environment
 
 set -x
 hs-app-template \
