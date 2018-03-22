@@ -52,7 +52,9 @@ jobs:
           key: cache--stack-work-{{ checksum "stack.yaml" }}
           paths: ~/project/.stack-work
 
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
+
       - run:
           name: Install Docker client
           command: |

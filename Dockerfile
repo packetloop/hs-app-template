@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:17.10
 LABEL maintainer="Tyler Durden <mayhem@arbor.net>"
 
 ADD docker/set-environment.sh /usr/local/bin/set-environment
