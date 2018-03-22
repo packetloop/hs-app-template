@@ -4,6 +4,9 @@ module App.Options where
 import Control.Lens
 import Control.Monad.Logger  (LogLevel (..))
 import Data.Semigroup        ((<>))
+import Data.Text             (Text)
+import Kafka.Consumer.Types
+import Kafka.Types
 import Network.AWS.Data.Text (FromText (..), fromText)
 import Network.AWS.S3.Types  (Region (..))
 import Network.Socket        (HostName)
@@ -11,10 +14,6 @@ import Network.StatsD        (SampleRate (..))
 import Options.Applicative
 import Text.Read             (readEither)
 
-import Kafka.Consumer.Types
-import Kafka.Types
-
-import           Data.Text   (Text)
 import qualified Data.Text   as T
 import qualified Network.AWS as AWS
 

@@ -1,8 +1,8 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses  #-}
 {-# LANGUAGE TemplateHaskell        #-}
-module App.AppEnv
-where
+
+module App.AppEnv where
 
 import App.Options
 import Arbor.Logger   (LogLevel, TimedFastLogger)

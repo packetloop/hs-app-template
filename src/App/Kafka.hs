@@ -1,11 +1,10 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module App.Kafka
-( ConsumerGroupSuffix(..), TopicName(..)
-, KafkaConsumer, KafkaProducer, Timeout(..)
-, mkConsumer
-, mkProducer
-)
-where
+  ( ConsumerGroupSuffix(..), TopicName(..)
+  , KafkaConsumer, KafkaProducer, Timeout(..)
+  , mkConsumer
+  , mkProducer
+  ) where
 
 import App.AppEnv
 import App.Options

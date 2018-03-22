@@ -1,9 +1,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module App.AppError
-( module App.AppError
-, Control.Monad.Except.throwError
-)
-where
+  ( module App.AppError
+  , Control.Monad.Except.throwError
+  ) where
 
 import Control.Monad.Catch
 import Control.Monad.Except

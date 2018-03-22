@@ -45,6 +45,7 @@ dependencies:
 - exceptions
 - fast-logger
 - hs-arbor-logger
+- http-client
 - hw-conduit
 - hw-kafka-avro
 - hw-kafka-client

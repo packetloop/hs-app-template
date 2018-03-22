@@ -1,12 +1,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module App.AWS.S3
-( downloadLBS, downloadLBS'
-, putFile, copySingle
-, BucketName(..)
-, ObjectKey(..)
-, ETag(..)
-, s3UriString
-) where
+  ( downloadLBS, downloadLBS'
+  , putFile, copySingle
+  , BucketName(..)
+  , ObjectKey(..)
+  , ETag(..)
+  , s3UriString
+  ) where
 
 import Control.Lens
 import Control.Monad
